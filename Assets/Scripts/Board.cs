@@ -1,15 +1,20 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using Sirenix.OdinInspector;
 
 [DefaultExecutionOrder(-1)]
-public class Board : MonoBehaviour
+public class Board : SerializedMonoBehaviour
 {
     public Tilemap tilemap { get; private set; }
     public Piece activePiece { get; private set; }
 
-    public TetrominoData[] tetrominoes;
+    public TetrominoList tetrominoesList;
     public Vector2Int boardSize = new Vector2Int(10, 20);
     public Vector3Int spawnPosition = new Vector3Int(-1, 8, 0);
+
+    [SerializeField]
+    public Dictionary<Vector3Int, TetrominoData> placedTiles = new Dictionary<Vector3Int, TetrominoData>();
 
     public RectInt Bounds
     {
@@ -24,9 +29,10 @@ public class Board : MonoBehaviour
     {
         tilemap = GetComponentInChildren<Tilemap>();
         activePiece = GetComponentInChildren<Piece>();
-
-        for (int i = 0; i < tetrominoes.Length; i++) {
-            tetrominoes[i].Initialize();
+        placedTiles = new Dictionary<Vector3Int, TetrominoData>();
+        
+        for (int i = 0; i < tetrominoesList.tetrominoes.Length; i++) {
+            tetrominoesList.tetrominoes[i].Initialize();
         }
     }
 
@@ -37,8 +43,8 @@ public class Board : MonoBehaviour
 
     public void SpawnPiece()
     {
-        int random = Random.Range(0, tetrominoes.Length);
-        TetrominoData data = tetrominoes[random];
+        int random = Random.Range(0, tetrominoesList.tetrominoes.Length);
+        TetrominoData data = tetrominoesList.tetrominoes[random];
 
         activePiece.Initialize(this, spawnPosition, data);
 
@@ -62,6 +68,15 @@ public class Board : MonoBehaviour
         {
             Vector3Int tilePosition = piece.cells[i] + piece.position;
             tilemap.SetTile(tilePosition, piece.data.tile);
+        }
+    }
+
+    public void SetPlacedTile(Piece piece)
+    {
+        for (int i = 0; i < piece.cells.Length; i++)
+        {
+            Vector3Int tilePosition = piece.cells[i] + piece.position;
+            placedTiles[tilePosition] = piece.data;
         }
     }
 
@@ -141,6 +156,10 @@ public class Board : MonoBehaviour
         {
             Vector3Int position = new Vector3Int(col, row, 0);
             tilemap.SetTile(position, null);
+            if (placedTiles.ContainsKey(position)) {
+                Debug.Log("Removed tile at " + placedTiles[position].tetromino);
+                placedTiles.Remove(position);
+            }
         }
 
         // Shift every row above down one

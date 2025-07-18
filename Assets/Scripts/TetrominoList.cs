@@ -1,6 +1,12 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
+[CreateAssetMenu(fileName = "New Tetromino", menuName = "Tetromino")]
+public class TetrominoList : ScriptableObject
+{
+    public TetrominoData[] tetrominoes;
+}
+
 public enum Tetromino
 {
     I, J, L, O, S, T, Z
@@ -10,6 +16,8 @@ public enum Tetromino
 public struct TetrominoData
 {
     public Tile tile;
+
+    public Sprite artwork;
     public Tetromino tetromino;
 
     public Vector2Int[] cells { get; private set; }

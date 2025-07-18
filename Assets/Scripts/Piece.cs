@@ -114,6 +114,7 @@ public class Piece : MonoBehaviour
     private void Lock()
     {
         board.Set(this);
+        board.SetPlacedTile(this);
         board.ClearLines();
         board.SpawnPiece();
     }

@@ -16,6 +16,7 @@ public class Piece : MonoBehaviour
     private float moveTime;
     private float lockTime;
 
+
     public void Initialize(Board board, Vector3Int position, TetrominoData data)
     {
         this.data = data;
@@ -26,7 +27,7 @@ public class Piece : MonoBehaviour
         stepTime = Time.time + stepDelay;
         moveTime = Time.time + moveDelay;
         lockTime = 0f;
-
+        Debug.Log("Cells: " + data.cells.Length);
         if (cells == null) {
             cells = new Vector3Int[data.cells.Length];
         }
@@ -38,6 +39,11 @@ public class Piece : MonoBehaviour
 
     private void Update()
     {
+        if (board == null)
+        {
+            return;
+        }
+
         board.Clear(this);
 
         // We use a timer to allow the player to make adjustments to the piece
@@ -116,7 +122,11 @@ public class Piece : MonoBehaviour
         board.Set(this);
         board.SetPlacedTile(this);
         board.ClearLines();
-        board.SpawnPiece();
+        var card = UIEventManager.OnDrawCard?.Invoke();
+        if (card != null)
+        {
+            board.SpawnPiece(card.Value);
+        }
     }
 
     private bool Move(Vector2Int translation)

@@ -33,19 +33,25 @@ public class Board : SerializedMonoBehaviour
         
         for (int i = 0; i < tetrominoesList.tetrominoes.Length; i++) {
             tetrominoesList.tetrominoes[i].Initialize();
+            Debug.Log("Tetromino: " + tetrominoesList.tetrominoes[i].cells.Length);
         }
     }
 
-    private void Start()
+    [Button]
+    public void DrawCard()
     {
-        SpawnPiece();
+                var card = UIEventManager.OnDrawCard?.Invoke();
+        if (card != null)
+        {
+            card.Value.Initialize();
+            SpawnPiece(card.Value);
+        }
     }
 
-    public void SpawnPiece()
+    public void SpawnPiece(TetrominoData data)
     {
-        int random = Random.Range(0, tetrominoesList.tetrominoes.Length);
-        TetrominoData data = tetrominoesList.tetrominoes[random];
-
+        Debug.Log("Spawning piece: " + data.tetromino);
+        Debug.Log("Cells: " + data.cells.Length);
         activePiece.Initialize(this, spawnPosition, data);
 
         if (IsValidPosition(activePiece, spawnPosition)) {

@@ -13,8 +13,16 @@ public enum Tetromino
 }
 
 [System.Serializable]
-public struct TetrominoData
+public class TetrominoData
 {
+    public TetrominoData(TetrominoData data)
+    {
+        tile = data.tile;
+        artwork = data.artwork;
+        tetromino = data.tetromino;
+        cells = data.cells;
+        wallKicks = data.wallKicks;
+    }
     public Tile tile;
 
     public Sprite artwork;
@@ -23,7 +31,7 @@ public struct TetrominoData
     public Vector2Int[] cells { get; private set; }
     public Vector2Int[,] wallKicks { get; private set; }
 
-        public SpecialPower specialPower;
+    public PowerBase specialPower;
 
 
     public void Initialize()

@@ -11,4 +11,11 @@ public static class UIEventManager
 
     public static Func<List<TetrominoData>> GetDrawnCards;
 
+    public static Action RerollButtonClicked;
+
+    public static Action UpdateScorePanel;
+
+    public static Action PlayButtonClicked;
+
 }
+

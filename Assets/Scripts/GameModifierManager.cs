@@ -4,22 +4,25 @@ using UnityEngine;
 public class GameModifierManager : MonoBehaviour
 {
     public Board gameBoard;
-    public List<RoundModifierPower> activeModifiers;
+    public List<PowerBase> activePowers;  // Listeyi PowerBase'e değiştir
 
     void Start()
     {
         gameBoard = FindObjectOfType<Board>();
-        foreach (var modifier in activeModifiers)
+        foreach (var power in activePowers)
         {
-            modifier.Enable(gameBoard);
+            power.Enable(gameBoard);  // Event bazlı için
+            power.ApplyGlobal(gameBoard);  // Global için
         }
+        // Parça bazlı için: Piece'in Lock metoduna entegre et (aşağıda)
     }
 
     void OnDestroy()
     {
-        foreach (var modifier in activeModifiers)
+        foreach (var power in activePowers)
         {
-            modifier.Disable(gameBoard);
+            power.Disable(gameBoard);
+            power.RevertGlobal(gameBoard);
         }
     }
 }

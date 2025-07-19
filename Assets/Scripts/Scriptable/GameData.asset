@@ -9,7 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 825a0075f874649a9bfa5929d5fabe20, type: 3}
-  m_Name: UpgradeData
+  m_Script: {fileID: 11500000, guid: f23d5b159164a4436a317e6fb8609f3a, type: 3}
+  m_Name: GameData
   m_EditorClassIdentifier: 
-  upgrades: []
+  powers:
+  - {fileID: 11400000, guid: 635d0d7d46a1b463393abb0dba797c47, type: 2}
+  - {fileID: 11400000, guid: c2e1f81a00423450f86bb38787416af2, type: 2}
+  rerollValues: 050000000700000009000000

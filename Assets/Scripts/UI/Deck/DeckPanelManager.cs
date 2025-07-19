@@ -7,8 +7,11 @@ using Sirenix.OdinInspector;
 public class DeckPanelManager : MonoBehaviour
 {
     public TetrominoList tetrominoesList;
-    
+    public List<TetrominoData> allDeck;
+
     public List<TetrominoData> deck;
+
+    public List<TetrominoData> drawnCards;
 
 
     private void Start()
@@ -24,7 +27,8 @@ public class DeckPanelManager : MonoBehaviour
         {
             for (int i = 0; i < 10; i++)
             {
-                deck.Add(tetromino);
+                var card = new TetrominoData(tetromino);
+                deck.Add(card);
             }
         }
         ShuffleDeck();
@@ -45,16 +49,37 @@ public class DeckPanelManager : MonoBehaviour
         }
         var card = deck[0];
         deck.RemoveAt(0);
+        drawnCards.Add(card);
         return card;
     }
 
+    public void OnJokerCardBought(JokerUICard card)
+    {
+        Debug.Log("OnJokerCardBought");
+        Debug.Log(card.power);
+        if (card.power is ExplosionPower explosionPower)
+        {
+            Debug.Log("ExplosionPower");
+            Debug.Log(explosionPower.tetromino);
+            var cards = drawnCards.Where(x => x.tetromino == explosionPower.tetromino).ToList();
+            foreach (var card1 in cards)
+            {
+                Debug.Log(card1.tetromino);
+            }
+            cards.ForEach(x => x.specialPower = explosionPower);
+        }
+    }
+
+
     private void OnEnable()
     {
+        GameEvents.JokerCardBought += OnJokerCardBought;
         UIEventManager.OnDrawCard += DrawCard;
     }
 
     private void OnDisable()
     {
+        GameEvents.JokerCardBought -= OnJokerCardBought;
         UIEventManager.OnDrawCard -= DrawCard;
     }
 }

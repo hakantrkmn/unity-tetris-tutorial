@@ -23,7 +23,7 @@ public class CardsPanelManager : MonoBehaviour
             var card = UIEventManager.OnDrawCard?.Invoke();
             if (card != null)
             {
-                CreateCard(card.Value);
+                CreateCard(card);
             }
         }
 

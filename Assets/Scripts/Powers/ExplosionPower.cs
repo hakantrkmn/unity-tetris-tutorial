@@ -1,10 +1,12 @@
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "Explosion Power", menuName = "Tetris/Powers/Explosion")]
-public class ExplosionPower : SpecialPower
+public class ExplosionPower : PowerBase
 {
     [Tooltip("Patlama yarıçapı")]
     public int radius = 1;
+
+    public Tetromino tetromino;
 
     public override void Activate(Piece piece, Board board)
     {
@@ -17,7 +19,7 @@ public class ExplosionPower : SpecialPower
             for (int y = -radius; y <= radius; y++)
             {
                 Vector3Int targetPos = new Vector3Int(piecePosition.x + x, piecePosition.y + y, 0);
-                
+
                 // Patlamanın tahta sınırları içinde olduğundan emin ol
                 if (board.Bounds.Contains((Vector2Int)targetPos))
                 {
@@ -25,7 +27,7 @@ public class ExplosionPower : SpecialPower
                 }
             }
         }
-        
+
         Debug.Log($"{powerName} tetiklendi!");
     }
 }

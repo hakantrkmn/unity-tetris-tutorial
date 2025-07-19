@@ -1,10 +1,10 @@
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "Gold On Line Clear", menuName = "Tetris/Powers/Gold On Line Clear")]
-public class GoldOnLineClearPower : RoundModifierPower
+public class GoldOnLineClearPower : PowerBase
 {
     public int goldPerLine = 5;
-    
+
     public override void Enable(Board board)
     {
         GameEvents.OnLineCleared += GrantGold;

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using Sirenix.OdinInspector;
+using System.Linq;
 
 [DefaultExecutionOrder(-1)]
 public class Board : SerializedMonoBehaviour
@@ -32,7 +33,7 @@ public class Board : SerializedMonoBehaviour
         tilemap = GetComponentInChildren<Tilemap>();
         activePiece = GetComponentInChildren<Piece>();
         placedTiles = new Dictionary<Vector3Int, TetrominoData>();
-        
+
         for (int i = 0; i < tetrominoesList.tetrominoes.Length; i++) {
             tetrominoesList.tetrominoes[i].Initialize();
             Debug.Log("Tetromino: " + tetrominoesList.tetrominoes[i].cells.Length);
@@ -45,17 +46,16 @@ public class Board : SerializedMonoBehaviour
         deck = UIEventManager.GetDrawnCards?.Invoke();
         if (deck != null)
         {
-            deck[0].Initialize();
-            SpawnPiece(deck[0]);
+            deck.First().Initialize();
+            SpawnPiece();
         }
     }
 
-    public void SpawnPiece(TetrominoData data)
+    public void SpawnPiece()
     {
-        Debug.Log("Spawning piece: " + data.tetromino);
-        Debug.Log("Cells: " + data.cells.Length);
-        activePiece.Initialize(this, spawnPosition, data);
-
+        Debug.Log("Spawning piece: " + deck.First().tetromino);
+        Debug.Log("Cells: " + deck.First().cells.Length);
+        activePiece.Initialize(this, spawnPosition, deck.First());
         if (IsValidPosition(activePiece, spawnPosition)) {
             Set(activePiece);
         } else {
@@ -81,6 +81,8 @@ public class Board : SerializedMonoBehaviour
 
     public void SetPlacedTile(Piece piece)
     {
+        deck.Remove(piece.data);
+
         for (int i = 0; i < piece.cells.Length; i++)
         {
             Vector3Int tilePosition = piece.cells[i] + piece.position;
@@ -166,6 +168,10 @@ public class Board : SerializedMonoBehaviour
             tilemap.SetTile(position, null);
             if (placedTiles.ContainsKey(position)) {
                 Debug.Log("Removed tile at " + placedTiles[position].tetromino);
+                if (placedTiles[position].specialPower != null)
+                {
+                    Debug.Log("Special power: " + placedTiles[position].specialPower.name);
+                }
                 placedTiles.Remove(position);
             }
         }
@@ -186,6 +192,17 @@ public class Board : SerializedMonoBehaviour
         }
         GameEvents.TriggerLineCleared(1);
 
+    }
+
+
+    private void OnEnable()
+    {
+        UIEventManager.PlayButtonClicked += DrawCard;
+    }
+
+    private void OnDisable()
+    {
+        UIEventManager.PlayButtonClicked -= DrawCard;
     }
 
 }

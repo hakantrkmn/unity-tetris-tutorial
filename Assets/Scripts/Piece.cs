@@ -122,11 +122,7 @@ public class Piece : MonoBehaviour
         board.SetPlacedTile(this);
         board.ClearLines();
 
-        var card = UIEventManager.OnDrawCard?.Invoke();
-        if (card != null)
-        {
-            board.SpawnPiece(card.Value);
-        }
+        board.SpawnPiece();
     }
 
     private bool Move(Vector2Int translation)

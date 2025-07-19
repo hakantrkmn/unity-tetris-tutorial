@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -12,14 +13,20 @@ public class CardsPanelManager : MonoBehaviour
 
     public List<CardUI> drawnCards;
 
+    public int startCardCount = 10;
+
     [Button]
     public void DrawCard()
     {
-        var card = UIEventManager.OnDrawCard?.Invoke();
-        if (card != null)
+        for (int i = 0; i < startCardCount; i++)
         {
-            CreateCard(card.Value);
+            var card = UIEventManager.OnDrawCard?.Invoke();
+            if (card != null)
+            {
+                CreateCard(card.Value);
+            }
         }
+
     }
 
     [Button]
@@ -29,5 +36,17 @@ public class CardsPanelManager : MonoBehaviour
         card.GetComponent<CardUI>().sprite.sprite = tetromino.artwork;
         card.GetComponent<CardUI>().tetromino = tetromino;
         drawnCards.Add(card.GetComponent<CardUI>());
+    }
+
+    private void OnEnable()
+    {
+        UIEventManager.DeckInitialized += DrawCard;
+        UIEventManager.GetDrawnCards += () => drawnCards.Select(x => x.tetromino).ToList();
+    }
+
+    private void OnDisable()
+    {
+        UIEventManager.DeckInitialized -= DrawCard;
+        UIEventManager.GetDrawnCards -= () => drawnCards.Select(x => x.tetromino).ToList();
     }
 }

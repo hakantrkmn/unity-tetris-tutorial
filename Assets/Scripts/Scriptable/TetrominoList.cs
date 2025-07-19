@@ -23,6 +23,9 @@ public struct TetrominoData
     public Vector2Int[] cells { get; private set; }
     public Vector2Int[,] wallKicks { get; private set; }
 
+        public SpecialPower specialPower;
+
+
     public void Initialize()
     {
         cells = Data.Cells[tetromino];

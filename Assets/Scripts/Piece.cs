@@ -27,7 +27,6 @@ public class Piece : MonoBehaviour
         stepTime = Time.time + stepDelay;
         moveTime = Time.time + moveDelay;
         lockTime = 0f;
-        Debug.Log("Cells: " + data.cells.Length);
         if (cells == null) {
             cells = new Vector3Int[data.cells.Length];
         }
@@ -122,6 +121,7 @@ public class Piece : MonoBehaviour
         board.Set(this);
         board.SetPlacedTile(this);
         board.ClearLines();
+
         var card = UIEventManager.OnDrawCard?.Invoke();
         if (card != null)
         {

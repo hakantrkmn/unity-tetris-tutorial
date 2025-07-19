@@ -33,6 +33,7 @@ public class DeckPanelManager : MonoBehaviour
     public void ShuffleDeck()
     {
         deck = deck.OrderBy(x => Random.value).ToList();
+        UIEventManager.DeckInitialized?.Invoke();
     }
 
     public TetrominoData? DrawCard()

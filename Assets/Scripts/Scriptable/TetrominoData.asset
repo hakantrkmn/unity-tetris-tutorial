@@ -16,21 +16,28 @@ MonoBehaviour:
   - tile: {fileID: 11400000, guid: f6c4109fd0d185b419e5e665b07c42f0, type: 2}
     artwork: {fileID: 21300000, guid: 267f35f428ff742d18112d4c7d371605, type: 3}
     tetromino: 0
+    specialPower: {fileID: 11400000, guid: 635d0d7d46a1b463393abb0dba797c47, type: 2}
   - tile: {fileID: 11400000, guid: aa44b5216a5f39e4881c5323564afe81, type: 2}
     artwork: {fileID: 21300000, guid: eff17f28044014dad8b162f2038956cb, type: 3}
     tetromino: 1
+    specialPower: {fileID: 11400000, guid: 635d0d7d46a1b463393abb0dba797c47, type: 2}
   - tile: {fileID: 11400000, guid: ae5c5dcd9d2744248ba2beb6b8dab80f, type: 2}
     artwork: {fileID: 21300000, guid: 3994c06e6058f451b8078af18d931d3e, type: 3}
     tetromino: 2
+    specialPower: {fileID: 11400000, guid: 635d0d7d46a1b463393abb0dba797c47, type: 2}
   - tile: {fileID: 11400000, guid: 89eae29ecf56ea14c8b3927213a00066, type: 2}
     artwork: {fileID: 21300000, guid: 9e9c2fbce19a8447a9288a2a423f1f29, type: 3}
     tetromino: 3
+    specialPower: {fileID: 11400000, guid: 635d0d7d46a1b463393abb0dba797c47, type: 2}
   - tile: {fileID: 11400000, guid: 8316c87896e7b6448a324d8a66e43174, type: 2}
     artwork: {fileID: 21300000, guid: f18855962f5be452f9ed9f5d37b1e8b0, type: 3}
     tetromino: 4
+    specialPower: {fileID: 11400000, guid: 635d0d7d46a1b463393abb0dba797c47, type: 2}
   - tile: {fileID: 11400000, guid: be0a34e2a842ae742b4fa8541a5f9fcf, type: 2}
     artwork: {fileID: 21300000, guid: 4d3df42d2bda34992965503e68e0cf23, type: 3}
     tetromino: 5
+    specialPower: {fileID: 11400000, guid: 635d0d7d46a1b463393abb0dba797c47, type: 2}
   - tile: {fileID: 11400000, guid: 66df2645ff909154b9c8f7c006a6af32, type: 2}
     artwork: {fileID: 21300000, guid: 1614bf8ae31b34f41bd08dc73b92d4f6, type: 3}
     tetromino: 6
+    specialPower: {fileID: 11400000, guid: 635d0d7d46a1b463393abb0dba797c47, type: 2}

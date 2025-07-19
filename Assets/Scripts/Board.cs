@@ -16,6 +16,8 @@ public class Board : SerializedMonoBehaviour
     [SerializeField]
     public Dictionary<Vector3Int, TetrominoData> placedTiles = new Dictionary<Vector3Int, TetrominoData>();
 
+    public List<TetrominoData> deck;
+
     public RectInt Bounds
     {
         get
@@ -40,11 +42,11 @@ public class Board : SerializedMonoBehaviour
     [Button]
     public void DrawCard()
     {
-                var card = UIEventManager.OnDrawCard?.Invoke();
-        if (card != null)
+        deck = UIEventManager.GetDrawnCards?.Invoke();
+        if (deck != null)
         {
-            card.Value.Initialize();
-            SpawnPiece(card.Value);
+            deck[0].Initialize();
+            SpawnPiece(deck[0]);
         }
     }
 
@@ -182,6 +184,8 @@ public class Board : SerializedMonoBehaviour
 
             row++;
         }
+        GameEvents.TriggerLineCleared(1);
+
     }
 
 }

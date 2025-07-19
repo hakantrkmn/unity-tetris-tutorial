@@ -4,15 +4,13 @@ using UnityEngine;
 
 public class UpgradeManager : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
+    public UpgradeData upgradeData;
+
+    private void OnEnable() {
+        GetDataEvents.GetUpgradeData += () => upgradeData;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+    private void OnDisable() {
+        GetDataEvents.GetUpgradeData -= () => upgradeData;
     }
 }

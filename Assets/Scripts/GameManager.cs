@@ -2,11 +2,47 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    #region Singleton
+    private static GameManager _instance;
+    public static GameManager Instance
+    {
+        get
+        {
+            if (_instance == null)
+            {
+                _instance = FindObjectOfType<GameManager>();
+                if (_instance == null)
+                {
+                    GameObject go = new GameObject("GameManager");
+                    _instance = go.AddComponent<GameManager>();
+                }
+            }
+            return _instance;
+        }
+    }
+    #endregion
+    private void Awake()
+    {
+        if (_instance != null && _instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        _instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
     public GameData gameData;
     int rerollValueIndex = 0;
 
+    public int gold;
+    public int score;
+    public int level;
+    public float scoreMultiplier = GameConstants.DEFAULT_SCORE_MULTIPLIER;
+    public float speedMultiplier = GameConstants.DEFAULT_SPEED_MULTIPLIER;
+    public int rerollValue;
     private void Start() {
-        PlayerData.Instance.rerollValue = gameData.rerollValues[rerollValueIndex];
+        rerollValue = gameData.rerollValues[rerollValueIndex];
     }
 
     public void RerollButtonClicked()
@@ -16,12 +52,16 @@ public class GameManager : MonoBehaviour
         {
             rerollValueIndex = 0;
         }
-        int rerollValue = PlayerData.Instance.rerollValue;
-        PlayerData.Instance.gold -= rerollValue;
-        PlayerData.Instance.rerollValue = gameData.rerollValues[rerollValueIndex];
+        gold -= rerollValue;
+        rerollValue = gameData.rerollValues[rerollValueIndex];
         UIEventManager.UpdateScorePanel?.Invoke();
     }
-
+    public void AddScore(int baseScore)
+    {
+        score += Mathf.RoundToInt(baseScore * scoreMultiplier);
+        // Burada bir UI güncelleme event'i tetikleyebilirsiniz.
+        Debug.Log($"Skor: {score} (Çarpan: {scoreMultiplier})");
+    }
 
 
     private void OnEnable() {

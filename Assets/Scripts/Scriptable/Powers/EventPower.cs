@@ -27,3 +27,9 @@ public class EventPower : PowerBase
         // Özel mantık (örn. altın ver)
     }
 }
+
+public enum CardType
+{
+    Joker,
+    Tarot,
+}

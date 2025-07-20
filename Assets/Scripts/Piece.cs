@@ -8,9 +8,9 @@ public class Piece : MonoBehaviour
     public Vector3Int position { get; private set; }
     public int rotationIndex { get; private set; }
 
-    public float stepDelay = 1f;
-    public float moveDelay = 0.1f;
-    public float lockDelay = 0.5f;
+    public float stepDelay = GameConstants.DEFAULT_STEP_DELAY;
+    public float moveDelay = GameConstants.DEFAULT_MOVE_DELAY;
+    public float lockDelay = GameConstants.DEFAULT_LOCK_DELAY;
 
     private float stepTime;
     private float moveTime;
@@ -81,8 +81,8 @@ public class Piece : MonoBehaviour
         if (Input.GetKey(KeyCode.S))
         {
             if (Move(Vector2Int.down)) {
-                // Update the step time to prevent double movement
-                stepTime = Time.time + stepDelay;
+                // Hızlı indirme yapıldığında da zamanlayıcıyı çarpanı dikkate alarak sıfırlıyoruz.
+                ResetStepTime();
             }
         }
 
@@ -93,10 +93,19 @@ public class Piece : MonoBehaviour
             Move(Vector2Int.right);
         }
     }
+    private void ResetStepTime()
+    {
+        // GameManager'dan güncel hız çarpanını alıyoruz. Eğer GameManager yoksa, varsayılan olarak 1 kullanıyoruz.
+        float currentMultiplier = (GameManager.Instance != null) ? GameManager.Instance.speedMultiplier : GameConstants.DEFAULT_SPEED_MULTIPLIER;
 
+        // Bir sonraki düşme zamanını, temel gecikmeyi çarpanla ayarlayarak hesaplıyoruz.
+        // speedMultiplier < 1 olacağı için (örn. 0.8), gecikme azalır ve parça hızlanır.
+        stepTime = Time.time + (stepDelay * currentMultiplier);
+    }
     private void Step()
     {
-        stepTime = Time.time + stepDelay;
+        // stepTime'ı artık yeni metodumuzla, çarpanı dikkate alarak sıfırlıyoruz.
+        ResetStepTime();
 
         // Step down to the next row
         Move(Vector2Int.down);
@@ -120,6 +129,15 @@ public class Piece : MonoBehaviour
     {
         board.Set(this);
         board.SetPlacedTile(this);
+        GameEvents.TriggerPiecePlaced(this, board);
+        foreach (var power in data.specialPowers)
+        {
+            if (power is LazerDrill lazerDrill)
+            {
+                lazerDrill.Activate(this, board);
+            }
+
+        }
         board.ClearLines();
 
         board.SpawnPiece();
@@ -151,7 +169,7 @@ public class Piece : MonoBehaviour
         int originalRotation = rotationIndex;
 
         // Rotate all of the cells using a rotation matrix
-        rotationIndex = Wrap(rotationIndex + direction, 0, 4);
+        rotationIndex = Wrap(rotationIndex + direction, 0, GameConstants.ROTATION_STATES);
         ApplyRotationMatrix(direction);
 
         // Revert the rotation if the wall kick tests fail
@@ -178,8 +196,8 @@ public class Piece : MonoBehaviour
                 case Tetromino.I:
                 case Tetromino.O:
                     // "I" and "O" are rotated from an offset center point
-                    cell.x -= 0.5f;
-                    cell.y -= 0.5f;
+                    cell.x -= GameConstants.ROTATION_OFFSET;
+                    cell.y -= GameConstants.ROTATION_OFFSET;
                     x = Mathf.CeilToInt((cell.x * matrix[0] * direction) + (cell.y * matrix[1] * direction));
                     y = Mathf.CeilToInt((cell.x * matrix[2] * direction) + (cell.y * matrix[3] * direction));
                     break;

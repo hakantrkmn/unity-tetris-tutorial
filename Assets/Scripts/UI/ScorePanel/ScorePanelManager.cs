@@ -17,9 +17,9 @@ public class ScorePanelManager : MonoBehaviour
     [Button]
     public void UpdateScorePanel()
     {
-        goldText.text = PlayerData.Instance.gold.ToString();
-        scoreText.text = PlayerData.Instance.score.ToString();
-        levelText.text = "Level: " + PlayerData.Instance.level.ToString();
+        goldText.text = GameManager.Instance.gold.ToString();
+        scoreText.text = GameManager.Instance.score.ToString();
+        levelText.text = "Level: " + GameManager.Instance.level.ToString();
     }
 
     private void OnEnable() {

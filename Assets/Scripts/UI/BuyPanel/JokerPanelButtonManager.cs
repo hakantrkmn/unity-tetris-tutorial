@@ -10,8 +10,8 @@ public class JokerPanelButtonManager : MonoBehaviour
 
     public void RerollButtonClicked()
     {
-        int playerMoney = PlayerData.Instance.gold;
-        int rerollValue = PlayerData.Instance.rerollValue;
+        int playerMoney = GameManager.Instance.gold;
+        int rerollValue = GameManager.Instance.rerollValue;
         if (playerMoney >= rerollValue)
         {
             UIEventManager.RerollButtonClicked?.Invoke();

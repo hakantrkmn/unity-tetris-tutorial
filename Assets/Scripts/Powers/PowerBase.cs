@@ -10,10 +10,11 @@ public abstract class PowerBase : ScriptableObject
     public string description;
 
     public Sprite artwork;
+    public CardType cardType;
 
     // Gücün etkinleştirilmesi için ortak metot (alt sınıflar override eder)
-    public virtual void Activate(Piece piece, Board board) { }  // Parça bazlı için
-
+    public virtual void Activate(Board board, Vector3Int activationPosition) { }
+    public virtual void Activate(Piece piece, Board board) { }
     // Event bazlı için (Enable/Disable)
     public virtual void Enable(Board board) { }
     public virtual void Disable(Board board) { }

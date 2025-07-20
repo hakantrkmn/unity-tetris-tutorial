@@ -35,9 +35,4 @@ public class PlayerData : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
-    public int gold;
-    public int score;
-    public int level;
-
-    public int rerollValue;
 }

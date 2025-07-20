@@ -9,11 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 84348b7aef2be41faa9a464b73b123b6, type: 3}
-  m_Name: Explosion Power
+  m_Script: {fileID: 11500000, guid: 24b35960b33b4464c8f12c6606e6abd2, type: 3}
+  m_Name: Lazer Drill Power
   m_EditorClassIdentifier: 
-  powerName: explosion
-  description: asd
-  artwork: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
-  radius: 1
-  tetromino: 5
+  powerName: Lazer Drill
+  description: 
+  artwork: {fileID: 21300000, guid: 9e9c2fbce19a8447a9288a2a423f1f29, type: 3}
+  tetromino: 0

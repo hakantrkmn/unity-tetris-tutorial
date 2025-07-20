@@ -17,5 +17,7 @@ public static class UIEventManager
 
     public static Action PlayButtonClicked;
 
+    public static Action<PowerBase> JokerCardBought;
+
 }
 

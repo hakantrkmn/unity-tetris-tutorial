@@ -11,8 +11,8 @@ public class Board : SerializedMonoBehaviour
     public Piece activePiece { get; private set; }
 
     public TetrominoList tetrominoesList;
-    public Vector2Int boardSize = new Vector2Int(10, 20);
-    public Vector3Int spawnPosition = new Vector3Int(-1, 8, 0);
+    public Vector2Int boardSize = new Vector2Int(GameConstants.BOARD_WIDTH, GameConstants.BOARD_HEIGHT);
+    public Vector3Int spawnPosition = new Vector3Int(GameConstants.SPAWN_POSITION_X, GameConstants.SPAWN_POSITION_Y, GameConstants.SPAWN_POSITION_Z);
 
     [SerializeField]
     public Dictionary<Vector3Int, TetrominoData> placedTiles = new Dictionary<Vector3Int, TetrominoData>();
@@ -44,7 +44,7 @@ public class Board : SerializedMonoBehaviour
     public void DrawCard()
     {
         deck = UIEventManager.GetDrawnCards?.Invoke();
-        if (deck != null)
+        if (deck != null && deck.Count > 0)
         {
             deck.First().Initialize();
             SpawnPiece();
@@ -53,8 +53,10 @@ public class Board : SerializedMonoBehaviour
 
     public void SpawnPiece()
     {
-        Debug.Log("Spawning piece: " + deck.First().tetromino);
-        Debug.Log("Cells: " + deck.First().cells.Length);
+        if (deck.Count == 0)
+        {
+            deck = UIEventManager.GetDrawnCards?.Invoke();
+        }
         activePiece.Initialize(this, spawnPosition, deck.First());
         if (IsValidPosition(activePiece, spawnPosition)) {
             Set(activePiece);
@@ -124,18 +126,97 @@ public class Board : SerializedMonoBehaviour
 
     public void ClearLines()
     {
-        RectInt bounds = Bounds;
-        int row = bounds.yMin;
+        var fullRows = FindFullRows();
+        if (fullRows.Count == 0) return;
 
-        // Clear from bottom to top
-        while (row < bounds.yMax)
+        ClearRowsAndTriggerPowers(fullRows);
+        ShiftRemainingRows(fullRows);
+        GameEvents.TriggerLineCleared(fullRows.Count);
+    }
+
+    private List<int> FindFullRows()
+    {
+        RectInt bounds = Bounds;
+        List<int> fullRows = new List<int>();
+
+        for (int row = bounds.yMin; row < bounds.yMax; row++)
         {
-            // Only advance to the next row if the current is not cleared
-            // because the tiles above will fall down when a row is cleared
-            if (IsLineFull(row)) {
-                LineClear(row);
-            } else {
-                row++;
+            if (IsLineFull(row))
+            {
+                fullRows.Add(row);
+            }
+        }
+
+        return fullRows;
+    }
+
+    private void ClearRowsAndTriggerPowers(List<int> fullRows)
+    {
+        RectInt bounds = Bounds;
+
+        foreach (int row in fullRows)
+        {
+            for (int col = bounds.xMin; col < bounds.xMax; col++)
+            {
+                Vector3Int position = new Vector3Int(col, row, 0);
+
+                // Trigger powers before clearing
+                TriggerTilePowers(position);
+
+                // Clear tile from both visual and data
+                tilemap.SetTile(position, null);
+                placedTiles.Remove(position);
+            }
+        }
+    }
+
+    private void TriggerTilePowers(Vector3Int position)
+    {
+        if (placedTiles.TryGetValue(position, out TetrominoData data))
+        {
+            if (data.specialPowers != null && data.specialPowers.Count > 0)
+            {
+                var explosionPowers = data.specialPowers.OfType<ExplosionPower>().ToList();
+                foreach (var power in explosionPowers)
+                {
+                    power.Activate(this, position);
+                }
+            }
+        }
+    }
+
+    private void ShiftRemainingRows(List<int> clearedRows)
+    {
+        RectInt bounds = Bounds;
+        int writeRow = bounds.yMin;
+
+        for (int readRow = bounds.yMin; readRow < bounds.yMax; readRow++)
+        {
+            if (clearedRows.Contains(readRow))
+            {
+                continue;
+            }
+
+            ShiftRowData(readRow, writeRow, bounds);
+            writeRow++;
+        }
+    }
+
+    private void ShiftRowData(int fromRow, int toRow, RectInt bounds)
+    {
+        for (int col = bounds.xMin; col < bounds.xMax; col++)
+        {
+            Vector3Int fromPos = new Vector3Int(col, fromRow, 0);
+            Vector3Int toPos = new Vector3Int(col, toRow, 0);
+
+            // Move visual tile
+            tilemap.SetTile(toPos, tilemap.GetTile(fromPos));
+
+            // Move data
+            if (placedTiles.TryGetValue(fromPos, out TetrominoData data))
+            {
+                placedTiles[toPos] = data;
+                placedTiles.Remove(fromPos);
             }
         }
     }
@@ -157,41 +238,13 @@ public class Board : SerializedMonoBehaviour
         return true;
     }
 
+    /// <summary>
+    /// Clears a single line - deprecated, use ClearLines() instead
+    /// </summary>
+    [System.Obsolete("Use ClearLines() instead for better performance")]
     public void LineClear(int row)
     {
-        RectInt bounds = Bounds;
-
-        // Clear all tiles in the row
-        for (int col = bounds.xMin; col < bounds.xMax; col++)
-        {
-            Vector3Int position = new Vector3Int(col, row, 0);
-            tilemap.SetTile(position, null);
-            if (placedTiles.ContainsKey(position)) {
-                Debug.Log("Removed tile at " + placedTiles[position].tetromino);
-                if (placedTiles[position].specialPower != null)
-                {
-                    Debug.Log("Special power: " + placedTiles[position].specialPower.name);
-                }
-                placedTiles.Remove(position);
-            }
-        }
-
-        // Shift every row above down one
-        while (row < bounds.yMax)
-        {
-            for (int col = bounds.xMin; col < bounds.xMax; col++)
-            {
-                Vector3Int position = new Vector3Int(col, row + 1, 0);
-                TileBase above = tilemap.GetTile(position);
-
-                position = new Vector3Int(col, row, 0);
-                tilemap.SetTile(position, above);
-            }
-
-            row++;
-        }
-        GameEvents.TriggerLineCleared(1);
-
+        ClearLines();
     }
 
 

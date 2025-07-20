@@ -13,7 +13,7 @@ public class CardsPanelManager : MonoBehaviour
 
     public List<CardUI> drawnCards;
 
-    public int startCardCount = 10;
+    public int startCardCount = GameConstants.DEFAULT_START_CARD_COUNT;
 
     [Button]
     public void DrawCard()

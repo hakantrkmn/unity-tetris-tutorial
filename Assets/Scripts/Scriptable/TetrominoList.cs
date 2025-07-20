@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -22,6 +23,7 @@ public class TetrominoData
         tetromino = data.tetromino;
         cells = data.cells;
         wallKicks = data.wallKicks;
+        specialPowers = new List<PowerBase>();
     }
     public Tile tile;
 
@@ -31,7 +33,7 @@ public class TetrominoData
     public Vector2Int[] cells { get; private set; }
     public Vector2Int[,] wallKicks { get; private set; }
 
-    public PowerBase specialPower;
+    public List<PowerBase> specialPowers;
 
 
     public void Initialize()

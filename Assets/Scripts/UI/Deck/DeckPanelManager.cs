@@ -25,7 +25,7 @@ public class DeckPanelManager : MonoBehaviour
         deck = new List<TetrominoData>();
         foreach (var tetromino in tetrominoesList.tetrominoes)
         {
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < GameConstants.DEFAULT_DECK_SIZE; i++)
             {
                 var card = new TetrominoData(tetromino);
                 deck.Add(card);
@@ -57,16 +57,20 @@ public class DeckPanelManager : MonoBehaviour
     {
         Debug.Log("OnJokerCardBought");
         Debug.Log(card.power);
-        if (card.power is ExplosionPower explosionPower)
+        if (card.power.cardType == CardType.Joker)
         {
-            Debug.Log("ExplosionPower");
-            Debug.Log(explosionPower.tetromino);
-            var cards = drawnCards.Where(x => x.tetromino == explosionPower.tetromino).ToList();
-            foreach (var card1 in cards)
-            {
-                Debug.Log(card1.tetromino);
-            }
-            cards.ForEach(x => x.specialPower = explosionPower);
+            UIEventManager.JokerCardBought?.Invoke(card.power);
+        }
+        if (card.power is PiecePower piecePower)
+        {
+            var cards = drawnCards.Where(x => x.tetromino == piecePower.tetromino).ToList();
+            cards.ForEach(x => x.specialPowers.Add(piecePower));
+        }
+        if (card.power is EventPower eventPower)
+        {
+            GameModifierManager.Instance.activePowers.Add(eventPower);
+            GameModifierManager.Instance.StartPowers();
+
         }
     }
 

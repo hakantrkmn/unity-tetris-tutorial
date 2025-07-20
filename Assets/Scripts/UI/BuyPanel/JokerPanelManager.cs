@@ -28,7 +28,6 @@ public class JokerPanelManager : SerializedMonoBehaviour
         for (int i = 0; i < amount; i++) {
         // find first empty slot
         var emptySlot = powerSlots.FirstOrDefault(slot => slot.isSlotEmpty);
-        Debug.Log("Empty slot: " + emptySlot);
         var randomPower = availablePowers[Random.Range(0, availablePowers.Count)];
         var jokerUICard = Instantiate(jokerUICardPrefab, emptySlot.transform);
         jokerUICard.power = randomPower;

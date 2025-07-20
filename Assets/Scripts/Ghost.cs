@@ -19,6 +19,10 @@ public class Ghost : MonoBehaviour
 
     private void LateUpdate()
     {
+        if (GameManager.Instance.gameState != GameStates.OnGame)
+        {
+            return;
+        }
         Clear();
         Copy();
         Drop();

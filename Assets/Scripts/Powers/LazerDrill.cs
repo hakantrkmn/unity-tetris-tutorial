@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "Lazer Drill Power", menuName = "Tetris/Powers/Lazer Drill")]
@@ -40,5 +41,12 @@ public class LazerDrill : PiecePower
         }
 
         Debug.Log($"{powerName} tetiklendi ve sütunlar temizlendi!");
+    }
+
+    public override void ApplyToDeck(List<TetrominoData> deck)
+    {
+        Debug.Log($"{powerName} kartlara uygulandı!");
+        var cards = deck.Where(x => x.tetromino == tetromino).ToList();
+        cards.ForEach(x => x.specialPowers.Add(this));
     }
 }

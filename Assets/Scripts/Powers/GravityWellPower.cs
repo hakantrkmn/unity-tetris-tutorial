@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "Gravity Well Power", menuName = "Tetris/Powers/Gravity Well")]
-public class GravityWellPower : EventPower // Veya PowerBase'den türetin
+public class GravityWellPower : PowerBase // Veya PowerBase'den türetin
 {
     [Tooltip("Her kaç blokta bir etkinleşeceği")]
     public int blocksPerStack = 20;
@@ -15,6 +15,7 @@ public class GravityWellPower : EventPower // Veya PowerBase'den türetin
 
     public override void Enable(Board board)
     {
+        Debug.Log($"{powerName} etkinleştirildi!");
         // Parça yerleştiğinde UpdatePower metodunu çağır
         GameEvents.OnPiecePlaced += UpdatePower;
     }

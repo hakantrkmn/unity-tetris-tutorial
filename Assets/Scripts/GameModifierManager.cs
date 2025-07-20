@@ -23,7 +23,9 @@ public class GameModifierManager : MonoBehaviour
 
     public Board gameBoard;
     public List<PowerBase> activePowers;  // Listeyi PowerBase'e değiştir
+    public List<PowerBase> appliedPowers;
 
+    public GameObject ghost;
     private void Awake()
     {
         if (_instance != null && _instance != this)
@@ -38,15 +40,20 @@ public class GameModifierManager : MonoBehaviour
     void Start()
     {
         gameBoard = FindObjectOfType<Board>();
-        StartPowers();
     }
 
-    public void StartPowers()
+    public void StartPowers(List<TetrominoData> deck)
     {
         foreach (var power in activePowers)
         {
+            if (appliedPowers.Contains(power))
+            {
+                continue;
+            }
             power.Enable(gameBoard);  // Event bazlı için
             power.ApplyGlobal(gameBoard);  // Global için
+            power.ApplyToDeck(deck);
+            appliedPowers.Add(power);
         }
     }
 
@@ -57,5 +64,15 @@ public class GameModifierManager : MonoBehaviour
             power.Disable(gameBoard);
             power.RevertGlobal(gameBoard);
         }
+    }
+
+    public void EnableGhost()
+    {
+        ghost.SetActive(true);
+    }
+
+    public void DisableGhost()
+    {
+        ghost.SetActive(false);
     }
 }

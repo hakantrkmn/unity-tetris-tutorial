@@ -36,7 +36,6 @@ public class Board : SerializedMonoBehaviour
 
         for (int i = 0; i < tetrominoesList.tetrominoes.Length; i++) {
             tetrominoesList.tetrominoes[i].Initialize();
-            Debug.Log("Tetromino: " + tetrominoesList.tetrominoes[i].cells.Length);
         }
     }
 

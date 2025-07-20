@@ -61,17 +61,10 @@ public class DeckPanelManager : MonoBehaviour
         {
             UIEventManager.JokerCardBought?.Invoke(card.power);
         }
-        if (card.power is PiecePower piecePower)
-        {
-            var cards = drawnCards.Where(x => x.tetromino == piecePower.tetromino).ToList();
-            cards.ForEach(x => x.specialPowers.Add(piecePower));
-        }
-        if (card.power is EventPower eventPower)
-        {
-            GameModifierManager.Instance.activePowers.Add(eventPower);
-            GameModifierManager.Instance.StartPowers();
-
-        }
+        GameModifierManager.Instance.activePowers.Add(card.power);
+        var allCards = new List<TetrominoData>(deck);
+        allCards.AddRange(drawnCards);
+        GameModifierManager.Instance.StartPowers(allCards);
     }
 
 

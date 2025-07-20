@@ -8,7 +8,6 @@ public class Piece : MonoBehaviour
     public Vector3Int position { get; private set; }
     public int rotationIndex { get; private set; }
 
-    public float stepDelay = GameConstants.DEFAULT_STEP_DELAY;
     public float moveDelay = GameConstants.DEFAULT_MOVE_DELAY;
     public float lockDelay = GameConstants.DEFAULT_LOCK_DELAY;
 
@@ -24,7 +23,7 @@ public class Piece : MonoBehaviour
         this.position = position;
 
         rotationIndex = 0;
-        stepTime = Time.time + stepDelay;
+        stepTime = Time.time + GameManager.Instance.stepDelay;
         moveTime = Time.time + moveDelay;
         lockTime = 0f;
         if (cells == null) {
@@ -100,7 +99,7 @@ public class Piece : MonoBehaviour
 
         // Bir sonraki düşme zamanını, temel gecikmeyi çarpanla ayarlayarak hesaplıyoruz.
         // speedMultiplier < 1 olacağı için (örn. 0.8), gecikme azalır ve parça hızlanır.
-        stepTime = Time.time + (stepDelay * currentMultiplier);
+        stepTime = Time.time + (GameManager.Instance.stepDelay * currentMultiplier);
     }
     private void Step()
     {

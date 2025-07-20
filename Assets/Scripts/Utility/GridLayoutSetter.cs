@@ -37,7 +37,6 @@ public class GridLayoutSetter : MonoBehaviour
         float cellHeight = (height - totalVerticalSpace) / maxRowCount;
 
         gridLayout.cellSize = new Vector2(cellWidth, cellHeight);
-        Debug.Log($"Hesaplanan Hücre Boyutu: ({cellWidth}, {cellHeight})");
     }
 
     private void Start()
@@ -51,7 +50,7 @@ public class GridLayoutSetter : MonoBehaviour
     {
         // Bu karenin sonuna kadar bekle.
         yield return new WaitForEndOfFrame();
-        
+
         // Artık RectTransform boyutları doğru olmalı.
         SetGridLayoutSize();
     }

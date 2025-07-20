@@ -6,11 +6,12 @@ using UnityEngine;
 public class ExplosionPower : PiecePower
 {
     [Tooltip("Patlama yarıçapı")]
-    public int radius = 1;
+    public int radius = 2;
 
 
-    public override void Activate(Board board, Vector3Int activationPosition)
+    public override List<Vector3Int> Activate(Board board, Vector3Int activationPosition)
     {
+        List<Vector3Int> tiles = new List<Vector3Int>();
         // Artık 'piece.position' kullanmıyoruz!
         for (int x = -radius; x <= radius; x++)
         {
@@ -19,13 +20,13 @@ public class ExplosionPower : PiecePower
                 Vector3Int targetPos = new Vector3Int(activationPosition.x + x, activationPosition.y + y, 0);
                 if (board.Bounds.Contains((Vector2Int)targetPos))
                 {
-                    board.tilemap.SetTile(targetPos, null);
-                    board.placedTiles.Remove(targetPos);
+                    tiles.Add(targetPos);
                 }
             }
         }
 
         Debug.Log($"{powerName} tetiklendi!");
+        return tiles;
     }
 
     public override void ApplyToDeck(List<TetrominoData> deck)

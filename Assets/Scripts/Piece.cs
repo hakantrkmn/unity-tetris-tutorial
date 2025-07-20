@@ -16,6 +16,8 @@ public class Piece : MonoBehaviour
     private float lockTime;
 
 
+
+
     public void Initialize(Board board, Vector3Int position, TetrominoData data)
     {
         this.data = data;
@@ -37,6 +39,10 @@ public class Piece : MonoBehaviour
 
     private void Update()
     {
+        if (GameManager.Instance.gameState != GameStates.OnGame)
+        {
+            return;
+        }
         if (board == null)
         {
             return;
@@ -72,6 +78,8 @@ public class Piece : MonoBehaviour
         }
 
         board.Set(this);
+        board.SetPlacedTile(this);
+
     }
 
     private void HandleMoveInputs()
@@ -139,7 +147,6 @@ public class Piece : MonoBehaviour
         }
         board.ClearLines();
 
-        board.SpawnPiece();
     }
 
     private bool Move(Vector2Int translation)

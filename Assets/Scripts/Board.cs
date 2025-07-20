@@ -3,7 +3,8 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using Sirenix.OdinInspector;
 using System.Linq;
-
+using DG.Tweening;
+using System.Collections;
 [DefaultExecutionOrder(-1)]
 public class Board : SerializedMonoBehaviour
 {
@@ -90,7 +91,14 @@ public class Board : SerializedMonoBehaviour
             placedTiles[tilePosition] = piece.data;
         }
     }
-
+    public void ClearPlacedTile(Piece piece)
+    {
+        for (int i = 0; i < piece.cells.Length; i++)
+        {
+            Vector3Int tilePosition = piece.cells[i] + piece.position;
+            placedTiles.Remove(tilePosition);
+        }
+    }
     public void Clear(Piece piece)
     {
         for (int i = 0; i < piece.cells.Length; i++)
@@ -126,11 +134,21 @@ public class Board : SerializedMonoBehaviour
     public void ClearLines()
     {
         var fullRows = FindFullRows();
-        if (fullRows.Count == 0) return;
+        if (fullRows.Count == 0)
+        {
+            SpawnPiece();
+            return;
+        }
 
-        ClearRowsAndTriggerPowers(fullRows);
-        ShiftRemainingRows(fullRows);
-        GameEvents.TriggerLineCleared(fullRows.Count);
+        Debug.Log("ClearLines started");
+        GameManager.Instance.gameState = GameStates.OnAnimation;
+        ClearRowsAndTriggerPowers(fullRows).OnComplete(() => {
+            ShiftRemainingRows(fullRows);
+            GameEvents.TriggerLineCleared(fullRows.Count);
+            SpawnPiece();
+            Debug.Log("ClearLines completed");
+            GameManager.Instance.gameState = GameStates.OnGame;
+        });
     }
 
     private List<int> FindFullRows()
@@ -149,28 +167,56 @@ public class Board : SerializedMonoBehaviour
         return fullRows;
     }
 
-    private void ClearRowsAndTriggerPowers(List<int> fullRows)
+    public List<Vector3Int> GetPowerClearTiles(List<int> fullRows)
     {
         RectInt bounds = Bounds;
-
+        List<Vector3Int> tiles = new List<Vector3Int>();
         foreach (int row in fullRows)
         {
             for (int col = bounds.xMin; col < bounds.xMax; col++)
             {
                 Vector3Int position = new Vector3Int(col, row, 0);
 
-                // Trigger powers before clearing
-                TriggerTilePowers(position);
+                // Güçleri tetikle
+                tiles.AddRange(TriggerTilePowers(position));
 
-                // Clear tile from both visual and data
-                tilemap.SetTile(position, null);
-                placedTiles.Remove(position);
             }
         }
+        return tiles;
     }
 
-    private void TriggerTilePowers(Vector3Int position)
+    private Sequence ClearRowsAndTriggerPowers(List<int> fullRows)
     {
+        RectInt bounds = Bounds;
+
+        var sequence = DOTween.Sequence();
+        var powerClearTiles = GetPowerClearTiles(fullRows);
+        foreach (var tile in powerClearTiles)
+        {
+            ClearTile(tile);
+        }
+
+        sequence.AppendInterval(0.5f);
+
+        foreach (int row in fullRows)
+        {
+            for (int col = bounds.xMin; col < bounds.xMax; col++)
+            {
+                Vector3Int position = new Vector3Int(col, row, 0);
+                // Artık bu satır yerine yeni metodumuzu çağırıyoruz.
+                // tilemap.GetTile(position).DOFade(0, 0.5f); // ESKİ YANLIŞ KOD
+                sequence.Append(FadeAndClearTile(position)); // YENİ DOĞRU KOD
+                // Bu satırları da siliyoruz, çünkü bu işi artık OnComplete callback'i yapıyor.
+                // tilemap.SetTile(position, null);
+                // placedTiles.Remove(position);
+            }
+        }
+        return sequence;
+    }
+
+    private List<Vector3Int> TriggerTilePowers(Vector3Int position)
+    {
+        List<Vector3Int> tiles = new List<Vector3Int>();
         if (placedTiles.TryGetValue(position, out TetrominoData data))
         {
             if (data.specialPowers != null && data.specialPowers.Count > 0)
@@ -178,10 +224,11 @@ public class Board : SerializedMonoBehaviour
                 var explosionPowers = data.specialPowers.OfType<ExplosionPower>().ToList();
                 foreach (var power in explosionPowers)
                 {
-                    power.Activate(this, position);
+                    tiles.AddRange(power.Activate(this, position));
                 }
             }
         }
+        return tiles;
     }
 
     private void ShiftRemainingRows(List<int> clearedRows)
@@ -257,4 +304,40 @@ public class Board : SerializedMonoBehaviour
         UIEventManager.PlayButtonClicked -= DrawCard;
     }
 
+    private void ClearTile(Vector3Int position)
+    {
+        tilemap.SetTile(position, null);
+        placedTiles.Remove(position);
+    }
+
+    private Tween FadeAndClearTile(Vector3Int position)
+    {
+        // Önemli: Önce o pozisyonda bir tile olduğundan emin olalım.
+        if (!tilemap.HasTile(position)) return null;
+
+        // Hedef renk: Mevcut rengin aynısı ama alfası 0 (tamamen şeffaf).
+        Color targetColor = new Color(1, 1, 1, 0);
+
+        // DOTween.To() sihri burada başlıyor!
+        return DOTween.To(
+            // 1. Getter: Hangi değeri animasyonla değiştireceğiz? -> O pozisyondaki tile'ın rengini.
+            () => tilemap.GetColor(position),
+
+            // 2. Setter: Her animasyon adımında bu değerle ne yapacağız? -> O pozisyondaki tile'ın rengini yeni değerle güncelleyeceğiz.
+            (color) => tilemap.SetColor(position, color),
+
+            // 3. End Value: Animasyon bittiğinde değer ne olmalı? -> Şeffaf renk.
+            targetColor,
+
+            // 4. Duration: Animasyon ne kadar sürecek?
+            0.05f
+        ).OnComplete(() => {
+            // 5. OnComplete: Animasyon BİTTİĞİNDE ne olacak? -> Tile'ı ve verisini tamamen yok et.
+            tilemap.SetTile(position, null);
+            placedTiles.Remove(position);
+            // Not: İsteğe bağlı ama iyi bir pratik: Gelecekte o slota konacak tile'ların
+            // şeffaf olmaması için rengi varsayılana sıfırla.
+            tilemap.SetColor(position, Color.white);
+        });
+    }
 }

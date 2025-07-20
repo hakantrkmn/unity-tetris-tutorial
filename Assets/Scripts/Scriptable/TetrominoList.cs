@@ -30,6 +30,7 @@ public class TetrominoData
     public Sprite artwork;
     public Tetromino tetromino;
 
+
     public Vector2Int[] cells { get; private set; }
     public Vector2Int[,] wallKicks { get; private set; }
 

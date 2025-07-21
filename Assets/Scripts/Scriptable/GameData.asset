@@ -17,4 +17,5 @@ MonoBehaviour:
   - {fileID: 11400000, guid: c42cf4cae5cc244c49b21a1be3806ceb, type: 2}
   - {fileID: 11400000, guid: 10933076f2a85478481b4261fad63623, type: 2}
   - {fileID: 11400000, guid: a97ac5933c5424a729848f3102635aed, type: 2}
-  rerollValues: 050000000700000009000000
+  rerollPrices: 050000000700000009000000
+  spawnPosition: {x: 0, y: 8, z: 0}

@@ -5,7 +5,8 @@ using UnityEngine;
 
 public class SpecialCardBuyPanelManager : MonoBehaviour
 {
-    public List<Slot> slots;
+    public List<Slot> jokerSlots;
+    public List<Slot> tarotSlots;
 
     public SpecialCardUI specialCardPrefab;
 
@@ -22,7 +23,8 @@ public class SpecialCardBuyPanelManager : MonoBehaviour
 
     public void FillSlots()
     {
-        slots = GetComponentsInChildren<Slot>().ToList();
+        jokerSlots = GetComponentsInChildren<Slot>().Where(slot => slot.slotType == SlotTypes.JokerInUse).ToList();
+        tarotSlots = GetComponentsInChildren<Slot>().Where(slot => slot.slotType == SlotTypes.TarotInUse).ToList();
     }
 
     private void OnEnable()
@@ -37,7 +39,7 @@ public class SpecialCardBuyPanelManager : MonoBehaviour
 
     private void OnJokerCardBought(PowerBase power)
     {
-        var emptySlot = slots.FirstOrDefault(x => x.isSlotEmpty);
+        var emptySlot = jokerSlots.FirstOrDefault(x => x.isSlotEmpty);
         if (emptySlot == null)
         {
             Debug.Log("No empty slot found");

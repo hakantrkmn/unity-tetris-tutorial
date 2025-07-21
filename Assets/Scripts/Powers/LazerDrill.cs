@@ -36,7 +36,7 @@ public class LazerDrill : PiecePower
             {
                 Vector3Int positionToClear = new Vector3Int(columnX, y, 0);
                 board.tilemap.SetTile(positionToClear, null);
-                board.placedTiles.Remove(positionToClear);
+                board.tetronimoBoardController.ClearTetronimoPosition(positionToClear);
             }
         }
 

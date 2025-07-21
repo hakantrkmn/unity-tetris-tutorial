@@ -31,16 +31,16 @@ public class GravityWellPower : PowerBase // Veya PowerBase'den türetin
         if (GameManager.Instance == null) return;
 
         // 1. Tahtadaki blok sayısına göre "yığın" sayısını hesapla
-        int stacks = board.placedTiles.Count / blocksPerStack;
-        Debug.Log("piece count: " + board.placedTiles.Count);
+        int stacks = board.tetronimoBoardController.blockCount / blocksPerStack;
+        Debug.Log("piece count: " + board.tetronimoBoardController.blockCount);
         // 2. Yeni hız ve puan çarpanlarını hesapla
         // Hız için: 1'den çıkarıyoruz çünkü stepDelay azaldıkça hız artar.
         float newSpeedMultiplier = 1f - (stacks * speedIncreasePerStack);
         float newScoreMultiplier = 1f + (stacks * scoreIncreasePerStack);
 
         // 3. GameManager'daki genel çarpanları güncelle
-        GameManager.Instance.speedMultiplier = Mathf.Max(0.1f, newSpeedMultiplier); // Hızın çok artmasını önle
-        GameManager.Instance.scoreMultiplier = newScoreMultiplier;
+        GameManager.Instance.gameSession.speedMultiplier = Mathf.Max(0.1f, newSpeedMultiplier); // Hızın çok artmasını önle
+        GameManager.Instance.gameSession.scoreMultiplier = newScoreMultiplier;
 
         Debug.Log($"Yerçekimi Kuyusu: {stacks} yığın aktif. Hız Çarpanı: {newSpeedMultiplier}, Puan Çarpanı: {newScoreMultiplier}");
     }

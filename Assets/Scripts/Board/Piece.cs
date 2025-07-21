@@ -3,7 +3,7 @@ using UnityEngine;
 public class Piece : MonoBehaviour
 {
     public Board board { get; private set; }
-    public TetrominoData data { get; private set; }
+    public TetrominoData data;
     public Vector3Int[] cells { get; private set; }
     public Vector3Int position { get; private set; }
     public int rotationIndex { get; private set; }
@@ -25,7 +25,7 @@ public class Piece : MonoBehaviour
         this.position = position;
 
         rotationIndex = 0;
-        stepTime = Time.time + GameManager.Instance.stepDelay;
+        stepTime = Time.time + GameManager.Instance.gameSession.stepDelay;
         moveTime = Time.time + moveDelay;
         lockTime = 0f;
         if (cells == null) {
@@ -39,20 +39,13 @@ public class Piece : MonoBehaviour
 
     private void Update()
     {
-        if (GameManager.Instance.gameState != GameStates.OnGame)
-        {
-            return;
-        }
-        if (board == null)
+        if (GameManager.Instance.gameSession.gameState != GameStates.OnGame || board == null)
         {
             return;
         }
 
         board.Clear(this);
-
-        // We use a timer to allow the player to make adjustments to the piece
-        // before it locks in place
-        lockTime += Time.deltaTime;
+        board.ClearPlacedTile(this);
 
         // Handle rotation
         if (Input.GetKeyDown(KeyCode.Q)) {
@@ -62,12 +55,13 @@ public class Piece : MonoBehaviour
         }
 
         // Handle hard drop
-        if (Input.GetKeyDown(KeyCode.Space)) {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
             HardDrop();
+            return; // Parça kilitlendi, bu frame'de başka işlem yapma.
         }
 
-        // Allow the player to hold movement keys but only after a move delay
-        // so it does not move too fast
+        // Allow the player to hold movement keys
         if (Time.time > moveTime) {
             HandleMoveInputs();
         }
@@ -77,9 +71,26 @@ public class Piece : MonoBehaviour
             Step();
         }
 
+        // Parçanın daha aşağı inip inemediğini kontrol et.
+        if (!board.IsValidPosition(this, position + Vector3Int.down))
+        {
+            // Zemine değiyorsa, kilitlenme sayacını başlat/arttır.
+            lockTime += Time.deltaTime;
+
+            if (lockTime >= lockDelay)
+            {
+                Lock();
+                return; // Parça kilitlendi, bu frame'de başka işlem yapma.
+            }
+        }
+        else
+        {
+            // Zemine değmiyorsa (düşüyorsa), sayaç sıfırlanır.
+            lockTime = 0f;
+        }
+
         board.Set(this);
         board.SetPlacedTile(this);
-
     }
 
     private void HandleMoveInputs()
@@ -103,11 +114,11 @@ public class Piece : MonoBehaviour
     private void ResetStepTime()
     {
         // GameManager'dan güncel hız çarpanını alıyoruz. Eğer GameManager yoksa, varsayılan olarak 1 kullanıyoruz.
-        float currentMultiplier = (GameManager.Instance != null) ? GameManager.Instance.speedMultiplier : GameConstants.DEFAULT_SPEED_MULTIPLIER;
+        float currentMultiplier = (GameManager.Instance != null) ? GameManager.Instance.gameSession.speedMultiplier : GameConstants.DEFAULT_SPEED_MULTIPLIER;
 
         // Bir sonraki düşme zamanını, temel gecikmeyi çarpanla ayarlayarak hesaplıyoruz.
         // speedMultiplier < 1 olacağı için (örn. 0.8), gecikme azalır ve parça hızlanır.
-        stepTime = Time.time + (GameManager.Instance.stepDelay * currentMultiplier);
+        stepTime = Time.time + (GameManager.Instance.gameSession.stepDelay * currentMultiplier);
     }
     private void Step()
     {
@@ -117,10 +128,7 @@ public class Piece : MonoBehaviour
         // Step down to the next row
         Move(Vector2Int.down);
 
-        // Once the piece has been inactive for too long it becomes locked
-        if (lockTime >= lockDelay) {
-            Lock();
-        }
+        // Kilitlenme kontrolü buradan kaldırıldı ve Update'e taşındı.
     }
 
     private void HardDrop()

@@ -36,7 +36,6 @@ public class TetrominoData
 
     public List<PowerBase> specialPowers;
 
-
     public void Initialize()
     {
         cells = Data.Cells[tetromino];

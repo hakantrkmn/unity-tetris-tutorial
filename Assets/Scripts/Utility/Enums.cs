@@ -9,6 +9,23 @@ public enum GameStates
 
 }
 
+public enum SlotTypes
+{
+    JokerBuy,
+    JokerInUse,
+    TarotBuy,
+    TarotInUse,
+}
+
+public enum ButtonType
+{
+    Reroll,
+    Play,
+    Buy,
+
+    Discard,
+}
+
 [System.Serializable]
 public struct PlacedTile
 {

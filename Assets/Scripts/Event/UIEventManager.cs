@@ -13,9 +13,14 @@ public static class UIEventManager
 
     public static Action RerollButtonClicked;
 
+    public static Action<ButtonType> UpdateButtonText;
+    public static Action Reroll;
+
     public static Action UpdateScorePanel;
 
     public static Action PlayButtonClicked;
+
+    public static Action DiscardButtonClicked;
 
     public static Action<PowerBase> JokerCardBought;
 

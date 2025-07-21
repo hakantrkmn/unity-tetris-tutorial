@@ -4,5 +4,6 @@ using UnityEngine;
 
 public class Slot : MonoBehaviour
 {
+    public SlotTypes slotType;
     public bool isSlotEmpty = true;
 }

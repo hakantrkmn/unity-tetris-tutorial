@@ -34,9 +34,12 @@ public class GameModifierManager : MonoBehaviour
             return;
         }
         _instance = this;
-        DontDestroyOnLoad(gameObject);
     }
 
+    void OnValidate()
+    {
+        gameBoard = FindObjectOfType<Board>();
+    }
     void Start()
     {
         gameBoard = FindObjectOfType<Board>();

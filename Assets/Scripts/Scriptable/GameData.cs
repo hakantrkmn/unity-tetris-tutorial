@@ -5,5 +5,7 @@ using UnityEngine;
 public class GameData : ScriptableObject
 {
     public List<PowerBase> powers;
-    public int[] rerollValues;
+    public int[] rerollPrices;
+
+    public Vector3Int spawnPosition;
 }

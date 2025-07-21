@@ -33,54 +33,65 @@ public class GameManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
     public GameData gameData;
+    public GameSession gameSession;
     int rerollValueIndex = 0;
 
-    public float stepDelay = GameConstants.DEFAULT_STEP_DELAY;
-    public int gold;
-    public int score;
-    public int level;
-    public float scoreMultiplier = GameConstants.DEFAULT_SCORE_MULTIPLIER;
-    public float speedMultiplier = GameConstants.DEFAULT_SPEED_MULTIPLIER;
-    public int rerollValue;
-    public GameStates gameState = GameStates.OnPrepare;
-
     private void Start() {
-        rerollValue = gameData.rerollValues[rerollValueIndex];
+        gameSession.rerollValue = gameData.rerollPrices[rerollValueIndex];
+    }
+
+    public void Reroll()
+    {
+        rerollValueIndex++;
+        if (rerollValueIndex >= gameData.rerollPrices.Length)
+        {
+            rerollValueIndex = 0;
+        }
+        gameSession.gold -= gameSession.rerollValue;
+        gameSession.rerollValue = gameData.rerollPrices[rerollValueIndex];
+        UIEventManager.UpdateScorePanel?.Invoke();
+        UIEventManager.UpdateButtonText?.Invoke(ButtonType.Reroll);
     }
 
     public void RerollButtonClicked()
     {
-        rerollValueIndex++;
-        if (rerollValueIndex >= gameData.rerollValues.Length)
+        int playerMoney = gameSession.gold;
+        int rerollValue = gameSession.rerollValue;
+        if (playerMoney >= rerollValue)
         {
-            rerollValueIndex = 0;
+            UIEventManager.Reroll?.Invoke();
         }
-        gold -= rerollValue;
-        rerollValue = gameData.rerollValues[rerollValueIndex];
-        UIEventManager.UpdateScorePanel?.Invoke();
+        else
+        {
+            Debug.Log("Not enough money");
+        }
+
     }
     public void AddScore(int baseScore)
     {
-        score += Mathf.RoundToInt(baseScore * scoreMultiplier);
+        gameSession.score += Mathf.RoundToInt(baseScore * gameSession.scoreMultiplier);
         // Burada bir UI güncelleme event'i tetikleyebilirsiniz.
-        Debug.Log($"Skor: {score} (Çarpan: {scoreMultiplier})");
+        Debug.Log($"Skor: {gameSession.score} (Çarpan: {gameSession.scoreMultiplier})");
     }
 
     public void ChangeDropSpeed(float percentage)
     {
-        stepDelay *= (1 - percentage);
+        gameSession.stepDelay *= (1 - percentage);
     }
 
 
     private void OnEnable() {
         UIEventManager.RerollButtonClicked += RerollButtonClicked;
-        UIEventManager.PlayButtonClicked += () => gameState = GameStates.OnGame;
+        UIEventManager.PlayButtonClicked += () => gameSession.gameState = GameStates.OnGame;
         GetDataEvents.GetGameData += () => gameData;
+        UIEventManager.Reroll += Reroll;
     }
 
     private void OnDisable() {
         UIEventManager.RerollButtonClicked -= RerollButtonClicked;
-        UIEventManager.PlayButtonClicked -= () => gameState = GameStates.OnGame;
+        UIEventManager.PlayButtonClicked -= () => gameSession.gameState = GameStates.OnGame;
         GetDataEvents.GetGameData -= () => gameData;
+        UIEventManager.Reroll -= Reroll;
     }
 }
+

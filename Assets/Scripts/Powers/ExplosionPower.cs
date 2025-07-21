@@ -18,7 +18,7 @@ public class ExplosionPower : PiecePower
             for (int y = -radius; y <= radius; y++)
             {
                 Vector3Int targetPos = new Vector3Int(activationPosition.x + x, activationPosition.y + y, 0);
-                if (board.Bounds.Contains((Vector2Int)targetPos))
+                if (!board.tetronimoBoardController.IsTetronimoPositionEmpty(targetPos))
                 {
                     tiles.Add(targetPos);
                 }

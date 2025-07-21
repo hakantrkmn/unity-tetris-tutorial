@@ -14,12 +14,19 @@ public class JokerPanelManager : SerializedMonoBehaviour
     public List<Slot> powerSlots;
     public JokerUICard jokerUICardPrefab;
 
-    public TextMeshProUGUI rerollValueText;
-    private void Start() {
+
+    void OnValidate()
+    {
+        powerSlots = new List<Slot>();
+        powerSlots.AddRange(transform.GetComponentsInChildren<Slot>().Where(slot => slot.slotType == SlotTypes.JokerBuy));
+    }
+
+    private void Start()
+    {
         powerSlots = new List<Slot>();
         var gameData = GetDataEvents.GetGameData?.Invoke();
         availablePowers = new List<PowerBase>(gameData.powers);
-        powerSlots.AddRange(transform.GetComponentsInChildren<Slot>());
+        powerSlots.AddRange(transform.GetComponentsInChildren<Slot>().Where(slot => slot.slotType == SlotTypes.JokerBuy));
         CreateRandomPowerCard(powerSlots.Count);
     }
 
@@ -62,10 +69,12 @@ public class JokerPanelManager : SerializedMonoBehaviour
 
     public void UpdateRerollValueText()
     {
-        rerollValueText.text = "Reroll: " + GameManager.Instance.rerollValue.ToString();
+        Debug.Log(GameManager.Instance.gameSession.rerollValue);
+        Debug.Log(GameManager.Instance.gameSession.gold);
+        Debug.Log(GameManager.Instance.gameSession.rerollValue);
     }
 
-    public void RerollButtonClicked()
+    public void Reroll()
     {
         ClearPowerSlots();
         CreateRandomPowerCard(powerSlots.Count);
@@ -75,13 +84,13 @@ public class JokerPanelManager : SerializedMonoBehaviour
 
     private void OnEnable() {
         UIEventManager.UpdateScorePanel += UpdateRerollValueText;
-        UIEventManager.RerollButtonClicked += RerollButtonClicked;
+        UIEventManager.Reroll += Reroll;
 
     }
 
     private void OnDisable() {
         UIEventManager.UpdateScorePanel -= UpdateRerollValueText;
-        UIEventManager.RerollButtonClicked -= RerollButtonClicked;
+        UIEventManager.Reroll -= Reroll;
     }
 
 }

@@ -5,9 +5,23 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Lazer Drill Power", menuName = "Tetris/Powers/Lazer Drill")]
 public class LazerDrill : PiecePower
 {
-
-    public override void Activate(Piece piece, Board board)
+    public override void Enable(Board board)
     {
+        GameEvents.OnPiecePlaced += ActivateDrill;
+    }
+
+    public override void Disable(Board board)
+    {
+        GameEvents.OnPiecePlaced -= ActivateDrill;
+    }
+
+
+    public void ActivateDrill(Piece piece, Board board)
+    {
+        if (!piece.data.specialPowers.Contains(this))
+        {
+            return;
+        }
         // Adım 1: Parçanın kapladığı benzersiz sütunları bul.
         // HashSet, dikey parçanın aynı sütunu 4 kez eklemesini engeller.
         HashSet<int> columnsToDrill = new HashSet<int>();
@@ -35,8 +49,7 @@ public class LazerDrill : PiecePower
             for (int y = lowestYInColumn - 1; y >= board.Bounds.yMin; y--)
             {
                 Vector3Int positionToClear = new Vector3Int(columnX, y, 0);
-                board.tilemap.SetTile(positionToClear, null);
-                board.tetronimoBoardController.ClearTetronimoPosition(positionToClear);
+                board.powerClearTiles.Add(positionToClear);
             }
         }
 

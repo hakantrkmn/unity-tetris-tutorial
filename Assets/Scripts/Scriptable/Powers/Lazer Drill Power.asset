@@ -13,6 +13,11 @@ MonoBehaviour:
   m_Name: Lazer Drill Power
   m_EditorClassIdentifier: 
   powerName: Lazer Drill
-  description: 
+  description: "Bu I par\xE7as\u0131 yerle\u015Fti\u011Finde bir Lazer Matkap'a d\xF6n\xFC\u015F\xFCr!
+    Par\xE7an\u0131n kaplad\u0131\u011F\u0131 s\xFCtunlardan a\u015Fa\u011F\u0131ya
+    do\u011Fru lazer \u0131\u015F\u0131nlar\u0131 ate\u015Fleyerek yoluna \xE7\u0131kan
+    her \u015Feyi delip ge\xE7er ve tahtan\u0131n zeminine kadar temizler. Dikey
+    t\xFCneller a\xE7mak i\xE7in m\xFCkemmeldir."
   artwork: {fileID: 21300000, guid: 9e9c2fbce19a8447a9288a2a423f1f29, type: 3}
+  cardType: 0
   tetromino: 0

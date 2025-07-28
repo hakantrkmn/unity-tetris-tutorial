@@ -15,6 +15,8 @@ public enum SlotTypes
     JokerInUse,
     TarotBuy,
     TarotInUse,
+
+    Deck,
 }
 
 public enum ButtonType

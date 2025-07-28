@@ -33,6 +33,44 @@ public class TetrominoBoardController : MonoBehaviour
         blockCount++;
     }
 
+    public bool HasTile(Vector3Int position)
+    {
+        if (tetronimoBoard == null) return false;
+        //check if position is out of bounds
+        if (position.x + board.boardSize.x / 2 < 0 || position.x + board.boardSize.x / 2 >= board.boardSize.x || position.y + board.boardSize.y / 2 < 0 || position.y + board.boardSize.y / 2 >= board.boardSize.y)
+        {
+            return false;
+        }
+        return tetronimoBoard[position.x + board.boardSize.x / 2, position.y + board.boardSize.y / 2] != null;
+    }
+
+    [Button]
+    public void ClearRandomTileFromBoard()
+    {
+        List<Vector3Int> filledPositions = new List<Vector3Int>();
+        for (int y = board.boardSize.y - 1; y >= 0; y--)
+        {
+            for (int x = 0; x < board.boardSize.x; x++)
+            {
+                if (tetronimoBoard[x, y] != null)
+                {
+                    filledPositions.Add(new Vector3Int(x, y, 0));
+                }
+            }
+        }
+
+        if (filledPositions.Count == 0)
+            return; // veya default(TetrominoData)
+
+        // Rastgele bir pozisyon seç
+        int randomIndex = Random.Range(0, filledPositions.Count);
+        Vector3Int pos = filledPositions[randomIndex];
+        board.ClearTile(pos - new Vector3Int(board.boardSize.x / 2, board.boardSize.y / 2, 0));
+        ClearTetronimoPosition(pos - new Vector3Int(board.boardSize.x / 2, board.boardSize.y / 2, 0));
+        Debug.Log("ClearTetronimoPosition: " + pos);
+
+    }
+
     public void ClearTetronimoPosition(Vector3Int position)
     {
         if (tetronimoBoard == null) return;
@@ -50,7 +88,7 @@ public class TetrominoBoardController : MonoBehaviour
     public bool IsTetronimoPositionEmpty(Vector3Int position)
     {
         if (tetronimoBoard == null) return true;
-                //check if position is out of bounds
+        //check if position is out of bounds
         if (position.x + board.boardSize.x / 2 < 0 || position.x + board.boardSize.x / 2 >= board.boardSize.x || position.y + board.boardSize.y / 2 < 0 || position.y + board.boardSize.y / 2 >= board.boardSize.y)
         {
             return true;
@@ -58,6 +96,61 @@ public class TetrominoBoardController : MonoBehaviour
         return tetronimoBoard[position.x + board.boardSize.x / 2, position.y + board.boardSize.y / 2] == null;
     }
 
-    // Matrisi artık yeni pencerede çizdiğimiz için
-    // #if UNITY_EDITOR bloğunun tamamını silebilirsiniz.
+    public void ChangeBoardSize(int width, int height)
+    {
+        var oldBoard = tetronimoBoard;
+        var oldWidth = oldBoard?.GetLength(0) ?? 0;
+        var oldHeight = oldBoard?.GetLength(1) ?? 0;
+
+        tetronimoBoard = new TetrominoData[width, height];
+
+        // Eğer eski board yoksa, sadece yeni board oluştur
+        if (oldBoard == null) return;
+
+        // Eski board'dan yeni board'a veri kopyala
+        // Merkez noktalarını hesapla
+        int oldCenterX = oldWidth / 2;
+        int oldCenterY = oldHeight / 2;
+        int newCenterX = width / 2;
+        int newCenterY = height / 2;
+
+        // Kopyalanacak alanın sınırlarını belirle
+        int copyWidth = Mathf.Min(oldWidth, width);
+        int copyHeight = Mathf.Min(oldHeight, height);
+
+        // Eski board'dan yeni board'a veri kopyala
+        for (int y = 0; y < copyHeight; y++)
+        {
+            for (int x = 0; x < copyWidth; x++)
+            {
+                // Eski board'daki pozisyon
+                int oldX = x;
+                int oldY = y;
+
+                // Yeni board'daki pozisyon (merkez farkını hesapla)
+                int newX = x + (newCenterX - oldCenterX);
+                int newY = y + (newCenterY - oldCenterY);
+
+                // Sınırları kontrol et
+                if (newX >= 0 && newX < width && newY >= 0 && newY < height)
+                {
+                    tetronimoBoard[newX, newY] = oldBoard[oldX, oldY];
+                }
+            }
+        }
+
+        // Block count'u güncelle
+        blockCount = 0;
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                if (tetronimoBoard[x, y] != null)
+                {
+                    blockCount++;
+                }
+            }
+        }
+    }
+
 }

@@ -10,12 +10,16 @@ public class Board : SerializedMonoBehaviour
 {
     public Tilemap tilemap { get; private set; }
     public Piece activePiece { get; private set; }
+    public SpriteRenderer gridSpriteRenderer;
+    public DummyPiece dummyPiece;
     public GameData gameData;
     public TetrominoList tetrominoesList;
     public Vector2Int boardSize = new Vector2Int(GameConstants.BOARD_WIDTH, GameConstants.BOARD_HEIGHT);
     public TetrominoBoardController tetronimoBoardController;
     public List<TetrominoData> deck;
+    public List<Vector3Int> powerClearTiles = new List<Vector3Int>();
 
+    public Vector3Int currentPowerTilePosition;
     public RectInt Bounds
     {
         get
@@ -35,13 +39,14 @@ public class Board : SerializedMonoBehaviour
         tilemap = GetComponentInChildren<Tilemap>();
         activePiece = GetComponentInChildren<Piece>();
 
-        for (int i = 0; i < tetrominoesList.tetrominoes.Length; i++) {
+        for (int i = 0; i < tetrominoesList.tetrominoes.Length; i++)
+        {
             tetrominoesList.tetrominoes[i].Initialize();
         }
     }
 
     [Button]
-    public void DrawCard()
+    public void GetDeckAndSpawnpiece()
     {
         deck = UIEventManager.GetDrawnCards?.Invoke();
         if (deck != null && deck.Count > 0)
@@ -51,63 +56,55 @@ public class Board : SerializedMonoBehaviour
         }
     }
 
-    public void SpawnPiece()
+    public bool SpawnPiece()
     {
         if (deck.Count == 0)
         {
             //temporary. remove this after testing
-            deck = UIEventManager.GetDrawnCards?.Invoke();
+            GameEvents.GameStateOver?.Invoke();
+            GameManager.Instance.gameSession.gameState = GameStates.OnPrepare;
+            return false;
         }
+        GameManager.Instance.gameSession.gameState = GameStates.OnGame;
         activePiece.Initialize(this, gameData.spawnPosition, deck.First());
-        if (IsValidPosition(activePiece, gameData.spawnPosition)) {
-            Set(activePiece);
-        } else {
-            GameOver();
+        if (IsValidPosition(activePiece, gameData.spawnPosition))
+        {
+            SetPieceOnBoard(activePiece);
         }
+        else
+        {
+            GameOver();
+            return false;
+        }
+        return true;
     }
 
     public void GameOver()
     {
         tilemap.ClearAllTiles();
-
-        // Do anything else you want on game over here..
     }
-#region Set and Clear
-    public void Set(Piece piece)
-    {
-        for (int i = 0; i < piece.cells.Length; i++)
-        {
-            Vector3Int tilePosition = piece.cells[i] + piece.position;
-            tilemap.SetTile(tilePosition, piece.data.tile);
-        }
-    }
-
-    public void SetPlacedTile(Piece piece)
+    #region Set and Clear Piece on Board
+    public void SetPieceOnBoard(Piece piece)
     {
         deck.Remove(piece.data);
         for (int i = 0; i < piece.cells.Length; i++)
         {
             Vector3Int tilePosition = piece.cells[i] + piece.position;
+            tilemap.SetTile(tilePosition, piece.data.tile);
             tetronimoBoardController.SetTetronimoPosition(tilePosition, piece.data);
+
         }
     }
-    public void ClearPlacedTile(Piece piece)
-    {
-        for (int i = 0; i < piece.cells.Length; i++)
-        {
-            Vector3Int tilePosition = piece.cells[i] + piece.position;
-            tetronimoBoardController.ClearTetronimoPosition(tilePosition);
-        }
-    }
-    public void Clear(Piece piece)
+    public void ClearPieceOnBoard(Piece piece)
     {
         for (int i = 0; i < piece.cells.Length; i++)
         {
             Vector3Int tilePosition = piece.cells[i] + piece.position;
             tilemap.SetTile(tilePosition, null);
+            tetronimoBoardController.ClearTetronimoPosition(tilePosition);
         }
     }
-#endregion
+    #endregion
     public bool IsValidPosition(Piece piece, Vector3Int position)
     {
         RectInt bounds = Bounds;
@@ -118,12 +115,14 @@ public class Board : SerializedMonoBehaviour
             Vector3Int tilePosition = piece.cells[i] + position;
 
             // An out of bounds tile is invalid
-            if (!bounds.Contains((Vector2Int)tilePosition)) {
+            if (!bounds.Contains((Vector2Int)tilePosition))
+            {
                 return false;
             }
 
             // A tile already occupies the position, thus invalid
-            if (tilemap.HasTile(tilePosition)) {
+            if (tetronimoBoardController.HasTile(tilePosition))
+            {
                 return false;
             }
         }
@@ -131,24 +130,41 @@ public class Board : SerializedMonoBehaviour
         return true;
     }
 
-    public void ClearLines()
+    public void CheckPowerTilesAndClear(List<int> fullRows, bool spawnPiece)
+    {
+        GameManager.Instance.gameSession.gameState = GameStates.OnAnimation;
+        ClearRowsAndTriggerPowers(fullRows).OnComplete(() =>
+        {
+            powerClearTiles.Clear();
+            if (fullRows.Count == 0)
+            {
+                if (spawnPiece)
+                {
+                    SpawnPiece();
+                }
+                return;
+            }
+            ShiftRemainingRows(fullRows);
+            GameEvents.TriggerLineCleared(fullRows.Count);
+            if (SpawnPiece())
+            {
+                Debug.Log("ClearLines completed");
+                GameManager.Instance.gameSession.gameState = GameStates.OnGame;
+            }
+
+        });
+    }
+
+    public void ClearLines(bool spawnPiece = true)
     {
         var fullRows = FindFullRows();
         if (fullRows.Count == 0)
         {
-            SpawnPiece();
+            CheckPowerTilesAndClear(fullRows, spawnPiece);
             return;
         }
 
-        Debug.Log("ClearLines started");
-        GameManager.Instance.gameSession.gameState = GameStates.OnAnimation;
-        ClearRowsAndTriggerPowers(fullRows).OnComplete(() => {
-            ShiftRemainingRows(fullRows);
-            GameEvents.TriggerLineCleared(fullRows.Count);
-            SpawnPiece();
-            Debug.Log("ClearLines completed");
-            GameManager.Instance.gameSession.gameState = GameStates.OnGame;
-        });
+        CheckPowerTilesAndClear(fullRows, spawnPiece);
     }
 
     private List<int> FindFullRows()
@@ -166,11 +182,23 @@ public class Board : SerializedMonoBehaviour
 
         return fullRows;
     }
-
-    public List<Vector3Int> GetPowerClearTiles(List<int> fullRows)
+    public Sequence ClearPowerTiles()
     {
+        var powerSequence = DOTween.Sequence();
+        foreach (var tile in powerClearTiles)
+        {
+            if (tetronimoBoardController.HasTile(tile))
+            {
+                powerSequence.Append(FadeAndClearTile(tile));
+            }
+        }
+        powerClearTiles.Clear();
+        return powerSequence;
+    }
+    public Sequence GetPowerClearTilesAndClear(List<int> fullRows)
+    {
+        var powerSequence = DOTween.Sequence();
         RectInt bounds = Bounds;
-        List<Vector3Int> tiles = new List<Vector3Int>();
         foreach (int row in fullRows)
         {
             for (int col = bounds.xMin; col < bounds.xMax; col++)
@@ -178,28 +206,26 @@ public class Board : SerializedMonoBehaviour
                 Vector3Int position = new Vector3Int(col, row, 0);
 
                 // Güçleri tetikle
-                tiles.AddRange(TriggerTilePowers(position));
-
+                powerSequence.Append(TriggerTilePowers(position));
             }
         }
-        return tiles;
+        return powerSequence;
     }
 
     private Sequence ClearRowsAndTriggerPowers(List<int> fullRows)
     {
-        RectInt bounds = Bounds;
-
-        var sequence = DOTween.Sequence();
-        var powerClearTiles = GetPowerClearTiles(fullRows);
-        foreach (var tile in powerClearTiles)
+        var mainSequence = DOTween.Sequence();
+        if (powerClearTiles.Count > 0)
         {
-            ClearTile(tile);
+            mainSequence.Append(ClearPowerTiles());
         }
-
-        sequence.AppendInterval(0.5f);
+        RectInt bounds = Bounds;
+        mainSequence.Append(GetPowerClearTilesAndClear(fullRows));
+        mainSequence.AppendInterval(fullRows.Count > 0 ? 0.05f : 0f);
 
         foreach (int row in fullRows)
         {
+            var lineSequence = DOTween.Sequence();
             for (int col = bounds.xMin; col < bounds.xMax; col++)
             {
                 Vector3Int position = new Vector3Int(col, row, 0);
@@ -207,33 +233,40 @@ public class Board : SerializedMonoBehaviour
                 {
                     continue;
                 }
-                // Artık bu satır yerine yeni metodumuzu çağırıyoruz.
-                // tilemap.GetTile(position).DOFade(0, 0.5f); // ESKİ YANLIŞ KOD
-                sequence.Append(FadeAndClearTile(position)); // YENİ DOĞRU KOD
-                // Bu satırları da siliyoruz, çünkü bu işi artık OnComplete callback'i yapıyor.
-                // tilemap.SetTile(position, null);
-                // placedTiles.Remove(position);
+                if (tetronimoBoardController.HasTile(position))
+                {
+                    lineSequence.Append(FadeAndClearTile(position));
+                }
             }
+            mainSequence.Join(lineSequence);
         }
-        return sequence;
+        return mainSequence;
     }
 
-    private List<Vector3Int> TriggerTilePowers(Vector3Int position)
+    private Sequence TriggerTilePowers(Vector3Int position)
     {
-        List<Vector3Int> tiles = new List<Vector3Int>();
-        if (tetronimoBoardController.GetTetronimoPosition(position) != null)
+        var powerSequence = DOTween.Sequence();
+        var data = tetronimoBoardController.GetTetronimoPosition(position);
+        if (data != null)
         {
-            var data = tetronimoBoardController.GetTetronimoPosition(position);
+            currentPowerTilePosition = position;
             if (data.specialPowers != null && data.specialPowers.Count > 0)
             {
-                var explosionPowers = data.specialPowers.OfType<ExplosionPower>().ToList();
-                foreach (var power in explosionPowers)
+                foreach (var power in data.specialPowers)
                 {
-                    tiles.AddRange(power.Activate(this, position));
+                    power.Activate();
+                    foreach (var tile in powerClearTiles)
+                    {
+                        if (tetronimoBoardController.HasTile(tile))
+                        {
+                            powerSequence.Join(FadeAndClearTile(tile));
+                        }
+                    }
+                    powerClearTiles.Clear();
                 }
             }
         }
-        return tiles;
+        return powerSequence;
     }
 
     private void ShiftRemainingRows(List<int> clearedRows)
@@ -295,7 +328,8 @@ public class Board : SerializedMonoBehaviour
             Vector3Int position = new Vector3Int(col, row, 0);
 
             // The line is not full if a tile is missing
-            if (!tilemap.HasTile(position)) {
+            if (!tilemap.HasTile(position))
+            {
                 return false;
             }
         }
@@ -303,51 +337,98 @@ public class Board : SerializedMonoBehaviour
         return true;
     }
 
+    [Button]
+    public void SpawnRandomCardAndHardDrop()
+    {
+        var card = GameEvents.GetRandomCardFromDeck?.Invoke();
+        dummyPiece.Initialize(this, gameData.spawnPosition, card);
+        if (IsValidPosition(dummyPiece, gameData.spawnPosition))
+        {
+            dummyPiece.HardDrop();
+        }
+
+    }
+
+
 
     private void OnEnable()
     {
-        UIEventManager.PlayButtonClicked += DrawCard;
+        GameEvents.GameCanStart += GetDeckAndSpawnpiece;
     }
 
     private void OnDisable()
     {
-        UIEventManager.PlayButtonClicked -= DrawCard;
+        GameEvents.GameCanStart -= GetDeckAndSpawnpiece;
     }
 
-    private void ClearTile(Vector3Int position)
+    public void ClearTile(Vector3Int position)
     {
         tilemap.SetTile(position, null);
         tetronimoBoardController.ClearTetronimoPosition(position);
     }
 
-    private Tween FadeAndClearTile(Vector3Int position)
+    public Tween FadeAndClearTile(Vector3Int position)
     {
-        // Önemli: Önce o pozisyonda bir tile olduğundan emin olalım.
-        if (!tilemap.HasTile(position)) return null;
+        if (!tetronimoBoardController.HasTile(position)) return null;
 
-        // Hedef renk: Mevcut rengin aynısı ama alfası 0 (tamamen şeffaf).
-        Color targetColor = new Color(1, 1, 1, 0);
-
-        // DOTween.To() sihri burada başlıyor!
-        return DOTween.To(
-            // 1. Getter: Hangi değeri animasyonla değiştireceğiz? -> O pozisyondaki tile'ın rengini.
-            () => tilemap.GetColor(position),
-
-            // 2. Setter: Her animasyon adımında bu değerle ne yapacağız? -> O pozisyondaki tile'ın rengini yeni değerle güncelleyeceğiz.
-            (color) => tilemap.SetColor(position, color),
-
-            // 3. End Value: Animasyon bittiğinde değer ne olmalı? -> Şeffaf renk.
-            targetColor,
-
-            // 4. Duration: Animasyon ne kadar sürecek?
-            0.05f
-        ).OnComplete(() => {
-            // 5. OnComplete: Animasyon BİTTİĞİNDE ne olacak? -> Tile'ı ve verisini tamamen yok et.
+        var sequence = DOTween.Sequence();
+        sequence.AppendInterval(gameData.TILE_ANIMATION_SPEED);
+        sequence.AppendCallback(() =>
+        {
+            if (!tetronimoBoardController.HasTile(position)) return;
+            var data = tetronimoBoardController.GetTetronimoPosition(position);
+            GameEvents.PieceCleared?.Invoke(data);
             tilemap.SetTile(position, null);
             tetronimoBoardController.ClearTetronimoPosition(position);
-            // Not: İsteğe bağlı ama iyi bir pratik: Gelecekte o slota konacak tile'ların
-            // şeffaf olmaması için rengi varsayılana sıfırla.
-            tilemap.SetColor(position, Color.white);
         });
+        return sequence;
+
+
+    }
+
+    [Button]
+    public void ChangeBoardSize(int width, int height)
+    {
+        // Eski board sınırlarını al
+        var oldBounds = Bounds;
+
+        // Board size'ı güncelle
+        gridSpriteRenderer.size = new Vector2(width, height);
+        boardSize = new Vector2Int(width, height);
+
+        // Tetromino board controller'ı güncelle
+        tetronimoBoardController.ChangeBoardSize(width, height);
+
+        // Yeni board sınırlarını al
+        var newBounds = Bounds;
+
+        // Eski board sınırları dışında kalan tile'ları temizle
+        ClearTilesOutsideBounds(oldBounds, newBounds);
+    }
+
+    private void ClearTilesOutsideBounds(RectInt oldBounds, RectInt newBounds)
+    {
+        // Eski board'ın tüm pozisyonlarını kontrol et
+        for (int y = oldBounds.yMin; y < oldBounds.yMax; y++)
+        {
+            for (int x = oldBounds.xMin; x < oldBounds.xMax; x++)
+            {
+                Vector3Int position = new Vector3Int(x, y, 0);
+
+                // Eğer pozisyon yeni board sınırları dışındaysa temizle
+                if (!newBounds.Contains((Vector2Int)position))
+                {
+                    // Tile'ı temizle
+                    tilemap.SetTile(position, null);
+
+                    // Tetromino data'yı temizle (eğer varsa)
+                    if (tetronimoBoardController.HasTile(position))
+                    {
+                        tetronimoBoardController.ClearTetronimoPosition(position);
+                    }
+                }
+            }
+        }
     }
 }
+

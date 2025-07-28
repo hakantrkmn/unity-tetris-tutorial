@@ -30,14 +30,20 @@ public class GameManager : MonoBehaviour
         }
 
         _instance = this;
-        DontDestroyOnLoad(gameObject);
     }
     public GameData gameData;
     public GameSession gameSession;
+    public Board board;
     int rerollValueIndex = 0;
 
-    private void Start() {
+    private void OnValidate()
+    {
+        board = FindObjectOfType<Board>();
+    }
+    private void Start()
+    {
         gameSession.rerollValue = gameData.rerollPrices[rerollValueIndex];
+        board = FindObjectOfType<Board>();
     }
 
     public void Reroll()
@@ -67,6 +73,7 @@ public class GameManager : MonoBehaviour
         }
 
     }
+
     public void AddScore(int baseScore)
     {
         gameSession.score += Mathf.RoundToInt(baseScore * gameSession.scoreMultiplier);
@@ -74,24 +81,55 @@ public class GameManager : MonoBehaviour
         Debug.Log($"Skor: {gameSession.score} (Çarpan: {gameSession.scoreMultiplier})");
     }
 
-    public void ChangeDropSpeed(float percentage)
+    public void ChangeDropSpeed(float multiplier)
     {
-        gameSession.stepDelay *= (1 - percentage);
+        if (multiplier > 0)
+        {
+            gameSession.stepDelay *= multiplier;
+        }
+        else
+        {
+            gameSession.stepDelay /= Mathf.Abs(multiplier);
+        }
+    }
+
+    private void OnPieceCleared(TetrominoData data)
+    {
+        Debug.Log("PieceCleared: " + data.tetromino + " " + data.level + " " + data.points[data.level]);
+        gameSession.score += data.points[data.level];
+        UIEventManager.UpdateScorePanel?.Invoke();
+    }
+
+    private void OnLineCleared(int lines)
+    {
+        Debug.Log("LineCleared: " + lines);
+        gameSession.score += lines * 100;
+        UIEventManager.UpdateScorePanel?.Invoke();
+        if (lines == 2)
+        {
+            GameEvents.AddRandomCardToDeck?.Invoke();
+        }
     }
 
 
-    private void OnEnable() {
+    private void OnEnable()
+    {
         UIEventManager.RerollButtonClicked += RerollButtonClicked;
-        UIEventManager.PlayButtonClicked += () => gameSession.gameState = GameStates.OnGame;
+        GameEvents.GameCanStart += () => gameSession.gameState = GameStates.OnGame;
         GetDataEvents.GetGameData += () => gameData;
         UIEventManager.Reroll += Reroll;
+        GameEvents.PieceCleared += OnPieceCleared;
+        GameEvents.OnLineCleared += OnLineCleared;
     }
 
-    private void OnDisable() {
+    private void OnDisable()
+    {
         UIEventManager.RerollButtonClicked -= RerollButtonClicked;
-        UIEventManager.PlayButtonClicked -= () => gameSession.gameState = GameStates.OnGame;
+        GameEvents.GameCanStart -= () => gameSession.gameState = GameStates.OnGame;
         GetDataEvents.GetGameData -= () => gameData;
         UIEventManager.Reroll -= Reroll;
+        GameEvents.PieceCleared -= OnPieceCleared;
+        GameEvents.OnLineCleared -= OnLineCleared;
     }
 }
 

@@ -13,7 +13,11 @@ MonoBehaviour:
   m_Name: Explosion Power
   m_EditorClassIdentifier: 
   powerName: explosion
-  description: asd
+  description: "Bu T par\xE7as\u0131 tahtaya yerle\u015Fti\u011Finde bir patlama
+    yarat\u0131r ve etraf\u0131ndaki k\xFC\xE7\xFCk bir alandaki t\xFCm bloklar\u0131
+    an\u0131nda yok eder. Tahtada s\u0131k\u0131\u015Ft\u0131\u011F\u0131n\u0131z
+    anlar i\xE7in harika bir temizlik arac\u0131!"
   artwork: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
-  radius: 1
+  cardType: 0
   tetromino: 5
+  radius: 1

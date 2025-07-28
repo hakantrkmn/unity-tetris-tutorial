@@ -17,5 +17,14 @@ MonoBehaviour:
   - {fileID: 11400000, guid: c42cf4cae5cc244c49b21a1be3806ceb, type: 2}
   - {fileID: 11400000, guid: 10933076f2a85478481b4261fad63623, type: 2}
   - {fileID: 11400000, guid: a97ac5933c5424a729848f3102635aed, type: 2}
+  - {fileID: 11400000, guid: edcc24de595bb41e9ba0bcd5060a0c72, type: 2}
+  - {fileID: 11400000, guid: e1a7dabd027a7494daba78109c377a71, type: 2}
+  - {fileID: 11400000, guid: c68a5351e58cd441e8d116e77c7e7035, type: 2}
+  - {fileID: 11400000, guid: 9ef639af680f3446c8452b019228ee3e, type: 2}
+  - {fileID: 11400000, guid: 5a9e38a9e4fc24890b628dff74128fd7, type: 2}
+  - {fileID: 11400000, guid: 481471cbc9c69446c92fc2811a7a97a0, type: 2}
+  - {fileID: 11400000, guid: e08cdba5f80ed406694c390a38462de4, type: 2}
+  - {fileID: 11400000, guid: 07f4c3e87d6524584a19a7ecc2a48959, type: 2}
   rerollPrices: 050000000700000009000000
   spawnPosition: {x: 0, y: 8, z: 0}
+  levelScores: 

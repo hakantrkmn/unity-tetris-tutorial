@@ -37,8 +37,7 @@ public class JokerPanelManager : SerializedMonoBehaviour
         var emptySlot = powerSlots.FirstOrDefault(slot => slot.isSlotEmpty);
         var randomPower = availablePowers[Random.Range(0, availablePowers.Count)];
         var jokerUICard = Instantiate(jokerUICardPrefab, emptySlot.transform);
-        jokerUICard.power = randomPower;
-        jokerUICard.artwork.sprite = randomPower.artwork;
+        jokerUICard.SetPower(randomPower);
         jokerUICard.jokerPanelManager = this;
             availablePowers.Remove(randomPower);
             inUsePowers.Add(randomPower);
@@ -67,12 +66,7 @@ public class JokerPanelManager : SerializedMonoBehaviour
         }
     }
 
-    public void UpdateRerollValueText()
-    {
-        Debug.Log(GameManager.Instance.gameSession.rerollValue);
-        Debug.Log(GameManager.Instance.gameSession.gold);
-        Debug.Log(GameManager.Instance.gameSession.rerollValue);
-    }
+
 
     public void Reroll()
     {
@@ -83,13 +77,11 @@ public class JokerPanelManager : SerializedMonoBehaviour
     }
 
     private void OnEnable() {
-        UIEventManager.UpdateScorePanel += UpdateRerollValueText;
         UIEventManager.Reroll += Reroll;
 
     }
 
     private void OnDisable() {
-        UIEventManager.UpdateScorePanel -= UpdateRerollValueText;
         UIEventManager.Reroll -= Reroll;
     }
 

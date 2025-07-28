@@ -1,3 +1,5 @@
+using DG.Tweening;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 public class Piece : MonoBehaviour
@@ -16,7 +18,7 @@ public class Piece : MonoBehaviour
     private float lockTime;
 
 
-
+    public bool isReplaced = false;
 
     public void Initialize(Board board, Vector3Int position, TetrominoData data)
     {
@@ -28,29 +30,34 @@ public class Piece : MonoBehaviour
         stepTime = Time.time + GameManager.Instance.gameSession.stepDelay;
         moveTime = Time.time + moveDelay;
         lockTime = 0f;
-        if (cells == null) {
+        if (cells == null)
+        {
             cells = new Vector3Int[data.cells.Length];
         }
 
-        for (int i = 0; i < cells.Length; i++) {
+        for (int i = 0; i < cells.Length; i++)
+        {
             cells[i] = (Vector3Int)data.cells[i];
         }
     }
 
-    private void Update()
+    public virtual void Update()
     {
         if (GameManager.Instance.gameSession.gameState != GameStates.OnGame || board == null)
         {
             return;
         }
 
-        board.Clear(this);
-        board.ClearPlacedTile(this);
+        board.ClearPieceOnBoard(this);
+
 
         // Handle rotation
-        if (Input.GetKeyDown(KeyCode.Q)) {
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
             Rotate(-1);
-        } else if (Input.GetKeyDown(KeyCode.E)) {
+        }
+        else if (Input.GetKeyDown(KeyCode.E))
+        {
             Rotate(1);
         }
 
@@ -62,12 +69,14 @@ public class Piece : MonoBehaviour
         }
 
         // Allow the player to hold movement keys
-        if (Time.time > moveTime) {
+        if (Time.time > moveTime)
+        {
             HandleMoveInputs();
         }
 
         // Advance the piece to the next row every x seconds
-        if (Time.time > stepTime) {
+        if (Time.time > stepTime)
+        {
             Step();
         }
 
@@ -89,8 +98,7 @@ public class Piece : MonoBehaviour
             lockTime = 0f;
         }
 
-        board.Set(this);
-        board.SetPlacedTile(this);
+        board.SetPieceOnBoard(this);
     }
 
     private void HandleMoveInputs()
@@ -98,16 +106,20 @@ public class Piece : MonoBehaviour
         // Soft drop movement
         if (Input.GetKey(KeyCode.S))
         {
-            if (Move(Vector2Int.down)) {
+            if (Move(Vector2Int.down))
+            {
                 // Hızlı indirme yapıldığında da zamanlayıcıyı çarpanı dikkate alarak sıfırlıyoruz.
                 ResetStepTime();
             }
         }
 
         // Left/right movement
-        if (Input.GetKey(KeyCode.A)) {
+        if (Input.GetKey(KeyCode.A))
+        {
             Move(Vector2Int.left);
-        } else if (Input.GetKey(KeyCode.D)) {
+        }
+        else if (Input.GetKey(KeyCode.D))
+        {
             Move(Vector2Int.right);
         }
     }
@@ -131,30 +143,75 @@ public class Piece : MonoBehaviour
         // Kilitlenme kontrolü buradan kaldırıldı ve Update'e taşındı.
     }
 
-    private void HardDrop()
+    public void HardDrop()
     {
-        while (Move(Vector2Int.down)) {
+        while (Move(Vector2Int.down))
+        {
             continue;
         }
 
         Lock();
     }
 
-    private void Lock()
+    public virtual void Lock()
     {
-        board.Set(this);
-        board.SetPlacedTile(this);
-        GameEvents.TriggerPiecePlaced(this, board);
-        foreach (var power in data.specialPowers)
+        board.SetPieceOnBoard(this);
+        if (isReplaced)
         {
-            if (power is LazerDrill lazerDrill)
-            {
-                lazerDrill.Activate(this, board);
-            }
-
+            GameManager.Instance.ChangeDropSpeed(-0.5f);
+            isReplaced = false;
         }
+        GameEvents.TriggerPiecePlaced(this, board);
         board.ClearLines();
 
+    }
+
+    [Button]
+    public void ReplaceWithRandomCard()
+    {
+        board.ClearPieceOnBoard(this);
+        isReplaced = true;
+        GameManager.Instance.ChangeDropSpeed(0.5f);
+        // DeckPanelManager'dan random kart al
+        TetrominoData newCard = GameEvents.GetRandomCardFromDeck?.Invoke();
+
+        if (newCard != null)
+        {
+            // Yeni kartı mevcut parçaya ata
+            this.data = newCard;
+
+            // Hücreleri yeni karta göre güncelle
+            if (cells == null)
+            {
+                cells = new Vector3Int[data.cells.Length];
+            }
+
+            for (int i = 0; i < cells.Length; i++)
+            {
+                cells[i] = (Vector3Int)data.cells[i];
+            }
+
+            // Rotasyonu sıfırla
+            rotationIndex = 0;
+
+            // Pozisyonu geçerli bir konuma ayarla (gerekirse)
+            if (!board.IsValidPosition(this, position))
+            {
+                // Eğer mevcut pozisyon geçersizse, yukarı taşı
+                Vector3Int newPosition = position;
+                while (!board.IsValidPosition(this, newPosition))
+                {
+                    newPosition.y++;
+                }
+                position = newPosition;
+            }
+
+            Debug.Log($"Parça {data.tetromino} ile değiştirildi");
+        }
+        else
+        {
+            Debug.LogWarning("Random kart alınamadı!");
+        }
     }
 
     private bool Move(Vector2Int translation)
@@ -234,7 +291,8 @@ public class Piece : MonoBehaviour
         {
             Vector2Int translation = data.wallKicks[wallKickIndex, i];
 
-            if (Move(translation)) {
+            if (Move(translation))
+            {
                 return true;
             }
         }
@@ -246,7 +304,8 @@ public class Piece : MonoBehaviour
     {
         int wallKickIndex = rotationIndex * 2;
 
-        if (rotationDirection < 0) {
+        if (rotationDirection < 0)
+        {
             wallKickIndex--;
         }
 
@@ -255,9 +314,12 @@ public class Piece : MonoBehaviour
 
     private int Wrap(int input, int min, int max)
     {
-        if (input < min) {
+        if (input < min)
+        {
             return max - (min - input) % (max - min);
-        } else {
+        }
+        else
+        {
             return min + (input - min) % (max - min);
         }
     }

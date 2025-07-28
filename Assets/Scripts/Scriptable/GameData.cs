@@ -8,4 +8,8 @@ public class GameData : ScriptableObject
     public int[] rerollPrices;
 
     public Vector3Int spawnPosition;
+
+    public List<int> levelScores;
+
+    public float TILE_ANIMATION_SPEED = 0.05f;
 }

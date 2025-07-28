@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 public static class UIEventManager
 {
-    public static Func<TetrominoData?> OnDrawCard;
+    public static Func<int?, TetrominoData> OnDrawCard;
 
     public static Action DeckInitialized;
 
@@ -23,6 +23,11 @@ public static class UIEventManager
     public static Action DiscardButtonClicked;
 
     public static Action<PowerBase> JokerCardBought;
+
+    public static Action<PowerBase> TarotCardBought;
+
+    public static Action<List<PowerBase>> ShowTooltip;
+    public static Action HideTooltip;
 
 }
 

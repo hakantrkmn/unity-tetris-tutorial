@@ -108,5 +108,8 @@
     "list.activeSelectionBackground": "#2d3748",
     "list.hoverBackground": "#2d3748",
     "list.inactiveSelectionBackground": "#2d3748"
+  },
+  "[csharp]": {
+    "editor.defaultFormatter": "ms-dotnettools.csharp"
   }
 }

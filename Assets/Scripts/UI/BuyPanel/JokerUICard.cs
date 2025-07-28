@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using TMPro;
 
 // IBeginDragHandler arayüzünü ekliyoruz.
 public class JokerUICard : MonoBehaviour ,IPointerClickHandler,IBeginDragHandler,IEndDragHandler,IDragHandler,IDropHandler
@@ -12,7 +13,7 @@ public class JokerUICard : MonoBehaviour ,IPointerClickHandler,IBeginDragHandler
 
     public JokerPanelManager jokerPanelManager;
     private CanvasGroup canvasGroup;
-
+    public TextMeshProUGUI description;
     private void Awake()
     {
         // Sürükleme sırasında raycast'i devre dışı bırakabilmek için CanvasGroup bileşenine ihtiyacımız var.
@@ -21,6 +22,12 @@ public class JokerUICard : MonoBehaviour ,IPointerClickHandler,IBeginDragHandler
         {
             canvasGroup = gameObject.AddComponent<CanvasGroup>();
         }
+    }
+
+    public void SetPower(PowerBase power)
+    {
+        this.power = power;
+        description.text = power.description;
     }
 
     public void OnBeginDrag(PointerEventData eventData)

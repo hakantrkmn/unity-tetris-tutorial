@@ -9,24 +9,25 @@ public class ExplosionPower : PiecePower
     public int radius = 2;
 
 
-    public override List<Vector3Int> Activate(Board board, Vector3Int activationPosition)
+    public override void Activate()
     {
-        List<Vector3Int> tiles = new List<Vector3Int>();
+        var board = GameManager.Instance.board;
+        var activationPosition = board.currentPowerTilePosition;
         // Artık 'piece.position' kullanmıyoruz!
         for (int x = -radius; x <= radius; x++)
         {
             for (int y = -radius; y <= radius; y++)
             {
                 Vector3Int targetPos = new Vector3Int(activationPosition.x + x, activationPosition.y + y, 0);
-                if (!board.tetronimoBoardController.IsTetronimoPositionEmpty(targetPos))
+                if (board.tetronimoBoardController.HasTile(targetPos))
                 {
-                    tiles.Add(targetPos);
+                    board.powerClearTiles.Add(targetPos);
                 }
             }
         }
 
         Debug.Log($"{powerName} tetiklendi!");
-        return tiles;
+
     }
 
     public override void ApplyToDeck(List<TetrominoData> deck)

@@ -272,4 +272,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   buttonName: Button
   buttonText: Button
+  buttonType: 0
+  triggerEvent: 1
   eventToTrigger: PlayButtonClicked
+  buttonTextTMP: {fileID: 1823872221403597426}

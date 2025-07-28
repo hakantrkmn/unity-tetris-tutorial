@@ -6,7 +6,8 @@ public class PreparePanelManager : MonoBehaviour
 {
     public CanvasGroup canvasGroup;
 
-    private void OnValidate() {
+    private void OnValidate()
+    {
         canvasGroup = GetComponent<CanvasGroup>();
     }
 
@@ -24,11 +25,13 @@ public class PreparePanelManager : MonoBehaviour
 
     private void OnEnable()
     {
-        UIEventManager.PlayButtonClicked += Hide;
+        GameEvents.GameCanStart += Hide;
+        GameEvents.GameStateOver += Show;
     }
 
     private void OnDisable()
     {
-        UIEventManager.PlayButtonClicked -= Hide;
+        GameEvents.GameCanStart -= Hide;
+        GameEvents.GameStateOver -= Show;
     }
 }

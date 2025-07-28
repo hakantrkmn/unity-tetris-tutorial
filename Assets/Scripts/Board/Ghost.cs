@@ -40,7 +40,8 @@ public class Ghost : MonoBehaviour
 
     private void Copy()
     {
-        for (int i = 0; i < cells.Length; i++) {
+        for (int i = 0; i < cells.Length; i++)
+        {
             cells[i] = trackingPiece.cells[i];
         }
     }
@@ -52,20 +53,23 @@ public class Ghost : MonoBehaviour
         int current = position.y;
         int bottom = -mainBoard.boardSize.y / 2 - 1;
 
-        mainBoard.Clear(trackingPiece);
+        mainBoard.ClearPieceOnBoard(trackingPiece);
 
         for (int row = current; row >= bottom; row--)
         {
             position.y = row;
 
-            if (mainBoard.IsValidPosition(trackingPiece, position)) {
+            if (mainBoard.IsValidPosition(trackingPiece, position))
+            {
                 this.position = position;
-            } else {
+            }
+            else
+            {
                 break;
             }
         }
 
-        mainBoard.Set(trackingPiece);
+        mainBoard.SetPieceOnBoard(trackingPiece);
     }
 
     private void Set()

@@ -13,10 +13,10 @@ public abstract class PowerBase : ScriptableObject
     public Sprite artwork;
     public CardType cardType;
 
+
     // Gücün etkinleştirilmesi için ortak metot (alt sınıflar override eder)
-    public virtual List<Vector3Int> Activate(Board board, Vector3Int activationPosition) { return new List<Vector3Int>(); }
-    public virtual void Activate(Piece piece, Board board) { }
-    // Event bazlı için (Enable/Disable)
+    public virtual void Activate() { }    // Event bazlı için (Enable/Disable)
+
     public virtual void Enable(Board board) { }
 
     public virtual void ApplyToDeck(List<TetrominoData> deck) { }
@@ -32,4 +32,6 @@ public enum CardType
 {
     Joker,
     Tarot,
+
+    UseAndDestroy,
 }

@@ -12,6 +12,9 @@ public class DeckPanelManager : MonoBehaviour
     public List<TetrominoData> deck;
 
     public List<TetrominoData> drawnCards;
+    public List<CardUI> selectedCards;
+
+    public Transform deckContainer;
 
 
     private void Start()
@@ -40,18 +43,41 @@ public class DeckPanelManager : MonoBehaviour
         UIEventManager.DeckInitialized?.Invoke();
     }
 
-    public TetrominoData? DrawCard()
+    public TetrominoData DrawCard(int? index)
     {
         if (deck.Count == 0)
         {
             Debug.Log("No cards left in deck");
             return null;
         }
-        var card = deck[0];
-        deck.RemoveAt(0);
-        drawnCards.Add(card);
+        var card = deck[Random.Range(0, deck.Count)];
+        while (drawnCards.Contains(card))
+        {
+            card = deck[Random.Range(0, deck.Count)];
+        }
+        if (index != null)
+        {
+            drawnCards[index.Value] = card;
+        }
+        else
+        {
+            drawnCards.Add(card);
+        }
         return card;
     }
+
+    public TetrominoData AddRandomCardToDeck()
+    {
+        drawnCards.Add(deck[Random.Range(0, deck.Count)]);
+        return drawnCards.Last();
+    }
+
+    public TetrominoData GetRandomCardFromDeck()
+    {
+        var card = new TetrominoData(deck[Random.Range(0, deck.Count)]);
+        return card;
+    }
+
 
     public void OnJokerCardBought(JokerUICard card)
     {
@@ -61,6 +87,10 @@ public class DeckPanelManager : MonoBehaviour
         {
             UIEventManager.JokerCardBought?.Invoke(card.power);
         }
+        if (card.power.cardType == CardType.Tarot)
+        {
+            UIEventManager.TarotCardBought?.Invoke(card.power);
+        }
         GameModifierManager.Instance.activePowers.Add(card.power);
         var allCards = new List<TetrominoData>(deck);
         allCards.AddRange(drawnCards);
@@ -68,15 +98,37 @@ public class DeckPanelManager : MonoBehaviour
     }
 
 
+    public void DiscardCards()
+    {
+
+    }
+
+    [Button]
+    public void PlayButtonClicked()
+    {
+
+        GameEvents.GameCanStart?.Invoke();
+    }
+
     private void OnEnable()
     {
+        UIEventManager.PlayButtonClicked += PlayButtonClicked;
         GameEvents.JokerCardBought += OnJokerCardBought;
         UIEventManager.OnDrawCard += DrawCard;
+        UIEventManager.DiscardButtonClicked += DiscardCards;
+        UIEventManager.GetDrawnCards += () => drawnCards;
+        GameEvents.AddRandomCardToDeck += AddRandomCardToDeck;
+        GameEvents.GetRandomCardFromDeck += GetRandomCardFromDeck;
     }
 
     private void OnDisable()
     {
+        UIEventManager.PlayButtonClicked -= PlayButtonClicked;
         GameEvents.JokerCardBought -= OnJokerCardBought;
         UIEventManager.OnDrawCard -= DrawCard;
+        UIEventManager.DiscardButtonClicked -= DiscardCards;
+        UIEventManager.GetDrawnCards -= () => drawnCards;
+        GameEvents.AddRandomCardToDeck -= AddRandomCardToDeck;
+        GameEvents.GetRandomCardFromDeck -= GetRandomCardFromDeck;
     }
 }

@@ -51,7 +51,7 @@ public class DeckPanelManager : MonoBehaviour
             return null;
         }
         var card = deck[Random.Range(0, deck.Count)];
-        while (drawnCards.Contains(card))
+        while (drawnCards.Contains(card) || selectedCards.Any(x => x.tetromino == card))
         {
             card = deck[Random.Range(0, deck.Count)];
         }
@@ -92,9 +92,7 @@ public class DeckPanelManager : MonoBehaviour
             UIEventManager.TarotCardBought?.Invoke(card.power);
         }
         GameModifierManager.Instance.activePowers.Add(card.power);
-        var allCards = new List<TetrominoData>(deck);
-        allCards.AddRange(drawnCards);
-        GameModifierManager.Instance.StartPowers(allCards);
+        GameModifierManager.Instance.StartPowers(drawnCards);
     }
 
 

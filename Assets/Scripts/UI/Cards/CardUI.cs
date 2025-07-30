@@ -6,16 +6,13 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler, IDragHandler, IBeginDragHandler
-, IDropHandler, IEndDragHandler
+public class CardUI : CardBase, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler, IDragHandler, IBeginDragHandler, IDropHandler, IEndDragHandler
 {
     public Image sprite;
     public TetrominoData tetromino;
 
     public bool isSelected = false;
     public bool isDragging = false;
-
-    public CardSlot slot;
 
     public DeckPanelManager deckPanelManager;
     public CardsPanelManager cardsPanelManager; // Reference to cards panel manager
@@ -29,16 +26,16 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
 
     private void Awake()
     {
-        slot = GetComponentInParent<CardSlot>();
+        slot = GetComponentInParent<Slot>();
         deckPanelManager = FindObjectOfType<DeckPanelManager>();
         canvas = GetComponentInParent<Canvas>();
+        cardsPanelManager = FindObjectOfType<CardsPanelManager>();
     }
 
-    public void SetCard(TetrominoData tetromino, CardsPanelManager cardsPanelManager)
+    public override void SetCard(TetrominoData tetromino)
     {
         this.tetromino = tetromino;
         sprite.sprite = tetromino.artwork;
-        this.cardsPanelManager = cardsPanelManager; // Set reference to this manager
         transform.DOLocalJump(Vector3.zero, 100, 1, 0.5f);
         canvasGroup.DOFade(1, 0.5f);
     }
@@ -156,4 +153,5 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
         // This method is now handled by the enhanced drag system
         // Keeping it for compatibility but functionality moved to OnEndDrag
     }
+
 }

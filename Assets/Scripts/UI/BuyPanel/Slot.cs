@@ -11,5 +11,18 @@ public class Slot : MonoBehaviour
 
     public int index;
 
+    public CardBase card;
+
+    public void Start()
+    {
+        card = GetComponentInChildren<CardBase>();
+    }
+
+    public void OnValidate()
+    {
+        card = GetComponentInChildren<CardBase>();
+        transform.name = slotType.ToString();
+    }
+
 
 }

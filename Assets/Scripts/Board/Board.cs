@@ -189,7 +189,7 @@ public class Board : SerializedMonoBehaviour
         {
             if (tetronimoBoardController.HasTile(tile))
             {
-                powerSequence.Append(FadeAndClearTile(tile));
+                powerSequence.Join(FadeAndClearTile(tile));
             }
         }
         powerClearTiles.Clear();

@@ -5,12 +5,13 @@ using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
 
-public class ScorePanelManager : MonoBehaviour
+public class InfoPanelManager : MonoBehaviour
 {
     public TextMeshProUGUI goldText;
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI levelText;
 
+    public TextMeshProUGUI stepTimeText;
     public int currentGold;
     public int currentScore;
     public int currentLevel;
@@ -34,18 +35,22 @@ public class ScorePanelManager : MonoBehaviour
         int targetGold = GameManager.Instance.gameSession.gold;
         int targetScore = GameManager.Instance.gameSession.score;
         int targetLevel = GameManager.Instance.gameSession.level;
-
+        float targetStepTime = GameManager.Instance.gameSession.stepDelay;
         // Animasyonları paralel olarak çalıştır
         DOTween.To(() => currentGold, (x) => goldText.text = x.ToString(), targetGold, 0.5f).SetId("ScorePanelAnimation");
         DOTween.To(() => currentScore, (x) => scoreText.text = x.ToString(), targetScore, 0.5f).SetId("ScorePanelAnimation");
         DOTween.To(() => currentLevel, (x) => levelText.text = "Level: " + x.ToString(), targetLevel, 0.5f).SetId("ScorePanelAnimation");
+
+        stepTimeText.text = targetStepTime.ToString("F2");
     }
 
-    private void OnEnable() {
+    private void OnEnable()
+    {
         UIEventManager.UpdateScorePanel += UpdateScorePanel;
     }
 
-    private void OnDisable() {
+    private void OnDisable()
+    {
         UIEventManager.UpdateScorePanel -= UpdateScorePanel;
     }
 }

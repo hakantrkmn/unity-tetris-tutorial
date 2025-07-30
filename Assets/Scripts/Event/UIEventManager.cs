@@ -29,5 +29,7 @@ public static class UIEventManager
     public static Action<List<PowerBase>> ShowTooltip;
     public static Action HideTooltip;
 
+    public static Action<PowerBase> SellJokerCard;
+
 }
 

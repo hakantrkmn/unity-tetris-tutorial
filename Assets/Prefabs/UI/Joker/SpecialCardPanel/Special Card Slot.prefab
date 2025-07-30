@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6205913318823741284}
-  - component: {fileID: 8271739237114069923}
+  - component: {fileID: 5028177165014376293}
   m_Layer: 5
   m_Name: Special Card Slot
   m_TagString: Untagged
@@ -38,7 +38,7 @@ RectTransform:
   m_AnchoredPosition: {x: 31.791668, y: -28.636366}
   m_SizeDelta: {x: 57.583336, y: 51.27273}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &8271739237114069923
+--- !u!114 &5028177165014376293
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -47,13 +47,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 6205913318823741287}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 00e01444818db44a3a35b7a0c31cf0a0, type: 3}
+  m_Script: {fileID: 11500000, guid: 695b2ae6fc4954811b77ed7149a1557a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   slotType: 0
   isSlotEmpty: 1
   index: 0
-  card: {fileID: 137047339869500685}
+  card: {fileID: 0}
 --- !u!1001 &7983968103724305283
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -151,17 +151,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f954a9329392e4fe1be87d52acf4ae51, type: 3}
---- !u!114 &137047339869500685 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8010253803307417230, guid: f954a9329392e4fe1be87d52acf4ae51, type: 3}
-  m_PrefabInstance: {fileID: 7983968103724305283}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 558a33f02abf54e788c8a518c1251aac, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!224 &6456093457539057728 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3986924251648066499, guid: f954a9329392e4fe1be87d52acf4ae51, type: 3}

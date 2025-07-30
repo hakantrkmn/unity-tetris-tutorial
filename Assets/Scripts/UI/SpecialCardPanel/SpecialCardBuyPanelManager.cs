@@ -5,8 +5,8 @@ using UnityEngine;
 
 public class SpecialCardBuyPanelManager : MonoBehaviour
 {
-    public List<SpecialCardSlot> jokerSlots;
-    public List<SpecialCardSlot> tarotSlots;
+    public List<Slot> jokerSlots;
+    public List<Slot> tarotSlots;
 
     public SpecialCardUI specialCardPrefab;
 
@@ -23,18 +23,18 @@ public class SpecialCardBuyPanelManager : MonoBehaviour
 
     public void FillSlots()
     {
-        jokerSlots = GetComponentsInChildren<SpecialCardSlot>().Where(slot => slot.slotType == SlotTypes.JokerInUse).ToList();
-        tarotSlots = GetComponentsInChildren<SpecialCardSlot>().Where(slot => slot.slotType == SlotTypes.TarotInUse).ToList();
+        jokerSlots = GetComponentsInChildren<Slot>().Where(slot => slot.slotType == SlotTypes.JokerInUse).ToList();
+        tarotSlots = GetComponentsInChildren<Slot>().Where(slot => slot.slotType == SlotTypes.TarotInUse).ToList();
 
         foreach (var slot in jokerSlots)
         {
-            slot.card = slot.GetComponentInChildren<SpecialCardUI>();
+            slot.card = slot.GetComponentInChildren<CardBase>();
             slot.card.slot = slot;
         }
 
         foreach (var slot in tarotSlots)
         {
-            slot.card = slot.GetComponentInChildren<SpecialCardUI>();
+            slot.card = slot.GetComponentInChildren<CardBase>();
             slot.card.slot = slot;
         }
     }
@@ -59,8 +59,8 @@ public class SpecialCardBuyPanelManager : MonoBehaviour
             Debug.Log("No empty slot found");
             return;
         }
-        emptySlot.card.SetPower(power);
-        emptySlot.card.specialCardBuyPanelManager = this;
+        emptySlot.card.SetCard(power);
+        (emptySlot.card as SpecialCardUI).specialCardBuyPanelManager = this;
         emptySlot.isSlotEmpty = false;
     }
 
@@ -72,8 +72,8 @@ public class SpecialCardBuyPanelManager : MonoBehaviour
             Debug.Log("No empty slot found");
             return;
         }
-        emptySlot.card.SetPower(power);
-        emptySlot.card.specialCardBuyPanelManager = this;
+        emptySlot.card.SetCard(power);
+        (emptySlot.card as SpecialCardUI).specialCardBuyPanelManager = this;
         emptySlot.isSlotEmpty = false;
     }
 }

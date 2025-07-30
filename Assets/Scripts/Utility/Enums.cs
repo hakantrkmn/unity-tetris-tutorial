@@ -26,6 +26,8 @@ public enum ButtonType
     Buy,
 
     Discard,
+
+    SellJokerCard,
 }
 
 [System.Serializable]

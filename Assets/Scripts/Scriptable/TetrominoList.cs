@@ -11,7 +11,7 @@ public class TetrominoList : ScriptableObject
 
 public enum Tetromino
 {
-    I, J, L, O, S, T, Z
+    I, J, L, O, S, T, Z, Empty
 }
 
 [System.Serializable]

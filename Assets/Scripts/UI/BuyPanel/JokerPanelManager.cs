@@ -31,14 +31,16 @@ public class JokerPanelManager : SerializedMonoBehaviour
     }
 
     [Button]
-    public void CreateRandomPowerCard(int amount) {
-        for (int i = 0; i < amount; i++) {
-        // find first empty slot
-        var emptySlot = powerSlots.FirstOrDefault(slot => slot.isSlotEmpty);
-        var randomPower = availablePowers[Random.Range(0, availablePowers.Count)];
-        var jokerUICard = Instantiate(jokerUICardPrefab, emptySlot.transform);
-        jokerUICard.SetPower(randomPower);
-        jokerUICard.jokerPanelManager = this;
+    public void CreateRandomPowerCard(int amount)
+    {
+        for (int i = 0; i < amount; i++)
+        {
+            // find first empty slot
+            var emptySlot = powerSlots.FirstOrDefault(slot => slot.isSlotEmpty);
+            var randomPower = availablePowers[Random.Range(0, availablePowers.Count)];
+            var jokerUICard = emptySlot.card as JokerUICard;
+            jokerUICard.SetCard(randomPower);
+            jokerUICard.jokerPanelManager = this;
             availablePowers.Remove(randomPower);
             inUsePowers.Add(randomPower);
             emptySlot.isSlotEmpty = false;
@@ -50,7 +52,7 @@ public class JokerPanelManager : SerializedMonoBehaviour
         foreach (var slot in powerSlots)
         {
             slot.isSlotEmpty = true;
-            Destroy(slot.transform.GetChild(0).gameObject);
+            (slot.card as JokerUICard).DestroyCard(false);
         }
 
     }
@@ -76,12 +78,14 @@ public class JokerPanelManager : SerializedMonoBehaviour
 
     }
 
-    private void OnEnable() {
+    private void OnEnable()
+    {
         UIEventManager.Reroll += Reroll;
 
     }
 
-    private void OnDisable() {
+    private void OnDisable()
+    {
         UIEventManager.Reroll -= Reroll;
     }
 

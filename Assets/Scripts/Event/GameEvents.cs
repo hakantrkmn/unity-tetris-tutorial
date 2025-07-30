@@ -16,9 +16,6 @@ public static class GameEvents
         OnPiecePlaced?.Invoke(piece, board);
     }
 
-    // Oyuncunun kaynaklarını (altın vb.) tutacak bir sisteme de ihtiyacın olacak.
-    // public static event Action<int> OnGoldGained;
-
     public static Action<JokerUICard> JokerCardBought;
 
     public static Action GameStateOver;

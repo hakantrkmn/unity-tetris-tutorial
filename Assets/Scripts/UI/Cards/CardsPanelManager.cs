@@ -8,33 +8,22 @@ using UnityEngine;
 
 public class CardsPanelManager : MonoBehaviour
 {
-    public GameObject cardPrefab;
-
-    public Transform cardContainer;
-
-
     public int startCardCount = GameConstants.DEFAULT_START_CARD_COUNT;
-
-    public List<CardSlot> slots;
-
-    public Slot deckSlot;
-
+    public List<Slot> slots;
     public DeckPanelManager deckPanelManager;
 
-    // Dynamic card moving system
     private CardUI draggedCard;
     private int originalSlotIndex = -1;
     private Canvas canvas;
 
     private void OnValidate()
     {
-        slots = GetComponentsInChildren<CardSlot>().ToList();
+        slots = GetComponentsInChildren<Slot>().ToList();
         deckPanelManager = FindObjectOfType<DeckPanelManager>();
     }
 
     private void Start()
     {
-        // Get canvas reference
         canvas = GetComponentInParent<Canvas>();
     }
 
@@ -101,7 +90,7 @@ public class CardsPanelManager : MonoBehaviour
                 var existingCard = slots[i].card;
                 if (existingCard != null && existingCard != card)
                 {
-                    allCards.Add(existingCard);
+                    allCards.Add(existingCard as CardUI);
                 }
             }
         }
@@ -254,7 +243,7 @@ public class CardsPanelManager : MonoBehaviour
             Debug.LogError("No empty slot found");
         }
 
-        slot.card.SetCard(tetromino, this);
+        slot.card.SetCard(tetromino);
     }
 
     public void DiscardCards()
@@ -295,7 +284,7 @@ public class CardsPanelManager : MonoBehaviour
         foreach (var slot in slots)
         {
             slot.isSlotEmpty = true;
-            slot.card.DestroyCard(false);
+            (slot.card as CardUI).DestroyCard(false);
         }
     }
 

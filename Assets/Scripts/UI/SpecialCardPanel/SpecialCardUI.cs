@@ -6,17 +6,16 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class SpecialCardUI : MonoBehaviour, IPointerClickHandler
+public class SpecialCardUI : CardBase, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
     public PowerBase power;
     public Image artwork;
     public TextMeshProUGUI description;
     public SpecialCardBuyPanelManager specialCardBuyPanelManager;
-    public SpecialCardSlot slot;
     public CanvasGroup canvasGroup;
+    public Button sellButton;
 
-
-    public void SetPower(PowerBase power)
+    public override void SetCard(PowerBase power)
     {
         this.power = power;
         description.text = power.description;
@@ -25,6 +24,22 @@ public class SpecialCardUI : MonoBehaviour, IPointerClickHandler
             canvasGroup.blocksRaycasts = true;
             canvasGroup.interactable = true;
         };
+    }
+
+    public void SellCard()
+    {
+        if (slot.slotType == SlotTypes.JokerInUse)
+        {
+            slot.isSlotEmpty = true;
+            UIEventManager.SellJokerCard?.Invoke(power);
+            canvasGroup.DOFade(0, 0.5f).onComplete = () =>
+            {
+                canvasGroup.blocksRaycasts = false;
+                canvasGroup.interactable = false;
+            };
+            power = null;
+            sellButton.gameObject.SetActive(false);
+        }
     }
 
     public void OnPointerClick(PointerEventData eventData)
@@ -39,5 +54,24 @@ public class SpecialCardUI : MonoBehaviour, IPointerClickHandler
             };
             slot.isSlotEmpty = true;
         }
+
     }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        if (slot.slotType == SlotTypes.JokerInUse)
+        {
+            sellButton.gameObject.SetActive(true);
+        }
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        if (slot.slotType == SlotTypes.JokerInUse)
+        {
+            sellButton.gameObject.SetActive(false);
+        }
+    }
+
+
 }

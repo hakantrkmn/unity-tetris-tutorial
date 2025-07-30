@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 using TMPro;
 
 // IBeginDragHandler arayüzünü ekliyoruz.
-public class JokerUICard : MonoBehaviour ,IPointerClickHandler,IBeginDragHandler,IEndDragHandler,IDragHandler,IDropHandler
+public class JokerUICard : CardBase, IPointerClickHandler, IBeginDragHandler, IEndDragHandler, IDragHandler, IDropHandler
 {
     public Image artwork;
     public PowerBase power;
@@ -24,10 +24,16 @@ public class JokerUICard : MonoBehaviour ,IPointerClickHandler,IBeginDragHandler
         }
     }
 
-    public void SetPower(PowerBase power)
+    public override void SetCard(PowerBase power)
     {
+        canvasGroup.alpha = 1;
         this.power = power;
         description.text = power.description;
+    }
+
+    public void DestroyCard(bool hasAnimation = true)
+    {
+        canvasGroup.alpha = 0;
     }
 
     public void OnBeginDrag(PointerEventData eventData)

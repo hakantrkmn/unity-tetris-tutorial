@@ -9,9 +9,24 @@ public class DeckPanelManager : MonoBehaviour
     public TetrominoList tetrominoesList;
     public List<TetrominoData> allDeck;
 
+    [SerializeField] private Tetromino tetrominoFilter = Tetromino.Empty;
+
+    [ShowInInspector]
+    [ShowIf("@tetrominoFilter == Tetromino.Empty")]
     public List<TetrominoData> deck;
 
+    [ShowInInspector]
+    [ShowIf("@tetrominoFilter != Tetromino.Empty")]
+    public List<TetrominoData> filteredDeck => deck?.Where(x => x.tetromino == tetrominoFilter).ToList();
+
+    [ShowInInspector]
+    [ShowIf("@tetrominoFilter == Tetromino.Empty")]
     public List<TetrominoData> drawnCards;
+
+    [ShowInInspector]
+    [ShowIf("@tetrominoFilter != Tetromino.Empty")]
+    public List<TetrominoData> filteredDrawnCards => drawnCards?.Where(x => x.tetromino == tetrominoFilter).ToList();
+
     public List<CardUI> selectedCards;
 
     public Transform deckContainer;
@@ -92,7 +107,7 @@ public class DeckPanelManager : MonoBehaviour
             UIEventManager.TarotCardBought?.Invoke(card.power);
         }
         GameModifierManager.Instance.activePowers.Add(card.power);
-        GameModifierManager.Instance.StartPowers(drawnCards);
+        GameModifierManager.Instance.StartPowers(deck);
     }
 
 

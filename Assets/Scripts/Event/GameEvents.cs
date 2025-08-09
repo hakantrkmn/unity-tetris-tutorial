@@ -1,14 +1,15 @@
 using System;
+using System.Collections.Generic;
 
 public static class GameEvents
 {
     // Bir sıra temizlendiğinde tetiklenir. Parametre: temizlenen sıra sayısı.
-    public static event Action<int> OnLineCleared;
+    public static event Action<int, List<TetrominoData>> OnLineCleared;
     public static event Action<Piece, Board> OnPiecePlaced;  // Yeni: Parça düştüğünde
 
-    public static void TriggerLineCleared(int lines)
+    public static void TriggerLineCleared(int lines, List<TetrominoData> clearedLineTiles)
     {
-        OnLineCleared?.Invoke(lines);
+        OnLineCleared?.Invoke(lines, clearedLineTiles);
     }
 
     public static void TriggerPiecePlaced(Piece piece, Board board)

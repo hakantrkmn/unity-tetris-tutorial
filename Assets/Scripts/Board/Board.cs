@@ -20,6 +20,8 @@ public class Board : SerializedMonoBehaviour
     public List<Vector3Int> powerClearTiles = new List<Vector3Int>();
 
     public Vector3Int currentPowerTilePosition;
+
+    public List<TetrominoData> clearedLineTiles = new List<TetrominoData>();
     public RectInt Bounds
     {
         get
@@ -145,7 +147,8 @@ public class Board : SerializedMonoBehaviour
                 return;
             }
             ShiftRemainingRows(fullRows);
-            GameEvents.TriggerLineCleared(fullRows.Count);
+            GameEvents.TriggerLineCleared(fullRows.Count, clearedLineTiles);
+            clearedLineTiles.Clear();
             if (SpawnPiece())
             {
                 Debug.Log("ClearLines completed");
@@ -233,8 +236,10 @@ public class Board : SerializedMonoBehaviour
                 {
                     continue;
                 }
-                if (tetronimoBoardController.HasTile(position))
+                var hasTile = tetronimoBoardController.GetTetronimoPosition(position);
+                if (hasTile != null)
                 {
+                    clearedLineTiles.Add(hasTile);
                     lineSequence.Append(FadeAndClearTile(position));
                 }
             }
@@ -310,12 +315,27 @@ public class Board : SerializedMonoBehaviour
             Vector3Int fromPos = new Vector3Int(col, fromRow, 0);
             Vector3Int toPos = new Vector3Int(col, toRow, 0);
 
-            // Move visual tile
-            tilemap.SetTile(toPos, tilemap.GetTile(fromPos));
-
-            // Move data
+            // Get the tetromino data first
             var data = tetronimoBoardController.GetTetronimoPosition(fromPos);
-            tetronimoBoardController.SetTetronimoPosition(toPos, data);
+
+            if (data != null)
+            {
+                // Apply the correct color to the tile before moving it
+                data.tile.color = data.color.color;
+                tilemap.SetTile(toPos, data.tile);
+
+                // Move the data
+                tetronimoBoardController.SetTetronimoPosition(toPos, data);
+            }
+            else
+            {
+                // If no data, just move the visual tile
+                tilemap.SetTile(toPos, tilemap.GetTile(fromPos));
+            }
+
+            // Clear the old position
+            tilemap.SetTile(fromPos, null);
+            tetronimoBoardController.ClearTetronimoPosition(fromPos);
         }
     }
 

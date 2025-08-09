@@ -27,14 +27,14 @@ public class TetrominoData
         specialPowers = new List<PowerBase>();
         points = new List<int>(data.points);
         level = data.level;
+        color = data.color;
     }
     public Tile tile;
     public List<int> points = new List<int>();
     public int level;
     public Sprite artwork;
     public Tetromino tetromino;
-
-
+    public TetrominoColor color;
     public Vector2Int[] cells { get; private set; }
     public Vector2Int[,] wallKicks { get; private set; }
 

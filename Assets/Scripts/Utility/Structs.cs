@@ -29,3 +29,11 @@ public class GameSession
 
 
 }
+
+
+[System.Serializable]
+public class TetrominoColor
+{
+    public Color color;
+    public string colorName;
+}

@@ -24,12 +24,15 @@ public class CardUI : CardBase, IPointerClickHandler, IPointerEnterHandler, IPoi
     // Drag system variables
     private Canvas canvas;
 
+    public AspectRatioFitter aspectRatioFitter;
+
     private void Awake()
     {
         slot = GetComponentInParent<Slot>();
         deckPanelManager = FindObjectOfType<DeckPanelManager>();
         canvas = GetComponentInParent<Canvas>();
         cardsPanelManager = FindObjectOfType<CardsPanelManager>();
+        aspectRatioFitter = GetComponent<AspectRatioFitter>();
     }
 
     public override void SetCard(TetrominoData tetromino)
@@ -38,6 +41,11 @@ public class CardUI : CardBase, IPointerClickHandler, IPointerEnterHandler, IPoi
         sprite.sprite = tetromino.artwork;
         transform.DOLocalJump(Vector3.zero, 100, 1, 0.5f);
         canvasGroup.DOFade(1, 0.5f);
+    }
+
+    private void Start()
+    {
+        aspectRatioFitter.enabled = false;
     }
 
     public void DestroyCard(bool hasAnimation = true)

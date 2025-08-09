@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -35,6 +36,7 @@ public class GameManager : MonoBehaviour
     public GameSession gameSession;
     public Board board;
     int rerollValueIndex = 0;
+
 
     private void OnValidate()
     {
@@ -100,9 +102,35 @@ public class GameManager : MonoBehaviour
         UIEventManager.UpdateScorePanel?.Invoke();
     }
 
-    private void OnLineCleared(int lines)
+    private void OnLineCleared(int lines, List<TetrominoData> clearedLineTiles)
     {
         Debug.Log("LineCleared: " + lines);
+
+        // Renklerine göre tile'ları grupla
+        Dictionary<TetrominoColor, List<TetrominoData>> tilesByColor = new Dictionary<TetrominoColor, List<TetrominoData>>();
+
+        foreach (var tile in clearedLineTiles)
+        {
+            Debug.Log("ClearedTile: " + tile.color);
+
+            // Aynı renkteki tile'ları aynı listeye ekle
+            if (!tilesByColor.ContainsKey(tile.color))
+            {
+                tilesByColor[tile.color] = new List<TetrominoData>();
+            }
+            tilesByColor[tile.color].Add(tile);
+        }
+
+        // Her renk grubunu ayrı ayrı logla
+        foreach (var colorGroup in tilesByColor)
+        {
+            Debug.Log($"Renk {colorGroup.Key.colorName}: {colorGroup.Value.Count} adet tile");
+            foreach (var tile in colorGroup.Value)
+            {
+                Debug.Log($"  - {tile.tetromino} (Level: {tile.level})");
+            }
+        }
+
         gameSession.score += lines * 100;
         UIEventManager.UpdateScorePanel?.Invoke();
         if (lines == 2)

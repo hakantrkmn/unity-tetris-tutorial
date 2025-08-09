@@ -32,7 +32,7 @@ public static class GameConstants
 
     #region UI & Deck
     public const int DEFAULT_START_CARD_COUNT = 10;
-    public const int DEFAULT_DECK_SIZE = 10;
+    public const int DEFAULT_DECK_SIZE = 4;
     #endregion
 
     #region Power System

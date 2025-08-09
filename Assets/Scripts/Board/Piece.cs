@@ -25,7 +25,7 @@ public class Piece : MonoBehaviour
         this.data = data;
         this.board = board;
         this.position = position;
-
+        this.data.tile.color = data.color.color;
         rotationIndex = 0;
         stepTime = Time.time + GameManager.Instance.gameSession.stepDelay;
         moveTime = Time.time + moveDelay;
@@ -149,7 +149,6 @@ public class Piece : MonoBehaviour
         {
             continue;
         }
-
         Lock();
     }
 

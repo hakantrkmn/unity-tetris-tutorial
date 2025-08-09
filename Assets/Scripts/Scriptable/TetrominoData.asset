@@ -13,45 +13,52 @@ MonoBehaviour:
   m_Name: TetrominoData
   m_EditorClassIdentifier: 
   tetrominoes:
-  - tile: {fileID: 11400000, guid: f6c4109fd0d185b419e5e665b07c42f0, type: 2}
+  - tile: {fileID: 11400000, guid: a5caa853d7f564d398b1dcf3703e4908, type: 2}
     points: 050000000a0000000f00000014000000
     level: 0
     artwork: {fileID: 21300000, guid: 2de5cad344e8048b8bd00e2262fd5a43, type: 3}
     tetromino: 0
+    color: {r: 0, g: 0, b: 0, a: 0}
     specialPowers: []
-  - tile: {fileID: 11400000, guid: aa44b5216a5f39e4881c5323564afe81, type: 2}
+  - tile: {fileID: 11400000, guid: a5caa853d7f564d398b1dcf3703e4908, type: 2}
     points: 050000000a0000000f00000014000000
     level: 0
     artwork: {fileID: 21300000, guid: aeea9f3060b2947d5a578400b0e6ff6b, type: 3}
     tetromino: 1
+    color: {r: 0, g: 0, b: 0, a: 0}
     specialPowers: []
-  - tile: {fileID: 11400000, guid: ae5c5dcd9d2744248ba2beb6b8dab80f, type: 2}
+  - tile: {fileID: 11400000, guid: a5caa853d7f564d398b1dcf3703e4908, type: 2}
     points: 050000000a0000000f00000014000000
     level: 0
     artwork: {fileID: 21300000, guid: eb23321db761d4434a2401a1dfd2e749, type: 3}
     tetromino: 2
+    color: {r: 0, g: 0, b: 0, a: 0}
     specialPowers: []
-  - tile: {fileID: 11400000, guid: 89eae29ecf56ea14c8b3927213a00066, type: 2}
+  - tile: {fileID: 11400000, guid: a5caa853d7f564d398b1dcf3703e4908, type: 2}
     points: 050000000a0000000f00000014000000
     level: 0
     artwork: {fileID: 21300000, guid: 4856c2936dc1e4cbf937782c1e970a74, type: 3}
     tetromino: 3
+    color: {r: 0, g: 0, b: 0, a: 0}
     specialPowers: []
-  - tile: {fileID: 11400000, guid: 8316c87896e7b6448a324d8a66e43174, type: 2}
+  - tile: {fileID: 11400000, guid: a5caa853d7f564d398b1dcf3703e4908, type: 2}
     points: 050000000a0000000f00000014000000
     level: 0
     artwork: {fileID: 21300000, guid: 154a24ed985364bd48f238c1cae1fefd, type: 3}
     tetromino: 4
+    color: {r: 0, g: 0, b: 0, a: 0}
     specialPowers: []
-  - tile: {fileID: 11400000, guid: be0a34e2a842ae742b4fa8541a5f9fcf, type: 2}
+  - tile: {fileID: 11400000, guid: a5caa853d7f564d398b1dcf3703e4908, type: 2}
     points: 050000000a0000000f00000014000000
     level: 0
     artwork: {fileID: 21300000, guid: 5c0373967059f4ecdb0e8d463a8208d0, type: 3}
     tetromino: 5
+    color: {r: 0, g: 0, b: 0, a: 0}
     specialPowers: []
-  - tile: {fileID: 11400000, guid: 66df2645ff909154b9c8f7c006a6af32, type: 2}
+  - tile: {fileID: 11400000, guid: a5caa853d7f564d398b1dcf3703e4908, type: 2}
     points: 050000000a0000000f00000014000000
     level: 0
     artwork: {fileID: 21300000, guid: e03b295b83a05465dba73566c985c6b6, type: 3}
     tetromino: 6
+    color: {r: 0, g: 0, b: 0, a: 0}
     specialPowers: []

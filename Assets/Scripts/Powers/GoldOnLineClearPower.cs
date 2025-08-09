@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "Gold On Line Clear", menuName = "Tetris/Powers/Gold On Line Clear")]
@@ -17,7 +18,7 @@ public class GoldOnLineClearPower : PowerBase
         Debug.Log($"{powerName} devre dışı!");
     }
 
-    private void GrantGold(int linesCleared)
+    private void GrantGold(int linesCleared, List<TetrominoData> clearedLineTiles)
     {
         int totalGold = linesCleared * goldPerLine;
         Debug.Log($"{totalGold} altın kazanıldı!");

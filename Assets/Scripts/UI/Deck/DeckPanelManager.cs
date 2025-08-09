@@ -46,6 +46,7 @@ public class DeckPanelManager : MonoBehaviour
             for (int i = 0; i < GameConstants.DEFAULT_DECK_SIZE; i++)
             {
                 var card = new TetrominoData(tetromino);
+                card.color = GameManager.Instance.gameData.tetrominoColors[i];
                 deck.Add(card);
             }
         }

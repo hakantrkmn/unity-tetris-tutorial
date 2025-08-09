@@ -12,4 +12,6 @@ public class GameData : ScriptableObject
     public List<int> levelScores;
 
     public float TILE_ANIMATION_SPEED = 0.05f;
+
+    public List<TetrominoColor> tetrominoColors;
 }
